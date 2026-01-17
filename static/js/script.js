@@ -308,10 +308,114 @@ function resetCrackTimes() {
 function updateCrackTimes(crackTimes) {
     if (!crackTimes) return;
     
-    document.getElementById('timeOnlineThrottled').textContent = crackTimes.online_throttling?.display || '-';
-    document.getElementById('timeOnlineNoThrottle').textContent = crackTimes.online_no_throttling?.display || '-';
-    document.getElementById('timeOfflineSlow').textContent = crackTimes.offline_slow?.display || '-';
-    document.getElementById('timeOfflineFast').textContent = crackTimes.offline_fast?.display || '-';
+    // Update crack time values
+    updateCrackTimeValue('timeOnlineThrottled', 'riskOnlineThrottled', crackTimes.online_throttling?.display || '-');
+    updateCrackTimeValue('timeOnlineNoThrottle', 'riskOnlineNoThrottle', crackTimes.online_no_throttling?.display || '-');
+    updateCrackTimeValue('timeOfflineSlow', 'riskOfflineSlow', crackTimes.offline_slow?.display || '-');
+    updateCrackTimeValue('timeOfflineFast', 'riskOfflineFast', crackTimes.offline_fast?.display || '-');
+    
+    // Update security summary
+    updateSecuritySummary(crackTimes);
+}
+
+function updateCrackTimeValue(elementId, riskId, value) {
+    const element = document.getElementById(elementId);
+    const riskElement = document.getElementById(riskId);
+    
+    if (element) {
+        element.textContent = value;
+        
+        // Add animation
+        const card = element.closest('.crack-time-card');
+        if (card) {
+            card.classList.add('updated');
+            setTimeout(() => card.classList.remove('updated'), 600);
+        }
+    }
+    
+    if (riskElement) {
+        // Update risk indicator color
+        const riskDot = riskElement.querySelector('.risk-dot');
+        if (riskDot) {
+            riskDot.className = 'risk-dot ' + getRiskClass(value);
+        }
+    }
+}
+
+function getRiskClass(timeString) {
+    if (!timeString || timeString === '-') return 'risk-low';
+    
+    const lowerTime = timeString.toLowerCase();
+    
+    if (lowerTime.includes('instant') || lowerTime.includes('second')) {
+        return 'risk-critical';
+    } else if (lowerTime.includes('minute') || lowerTime.includes('hour')) {
+        return 'risk-high';
+    } else if (lowerTime.includes('day') || lowerTime.includes('month')) {
+        return 'risk-medium';
+    } else {
+        return 'risk-low';
+    }
+}
+
+function updateSecuritySummary(crackTimes) {
+    // Use online throttled as the primary metric (most realistic scenario)
+    const primaryCrackTime = crackTimes.online_throttling?.display || '-';
+    const securityIcon = document.getElementById('securityIcon');
+    const securityTitle = document.getElementById('securityTitle');
+    const securityDesc = document.getElementById('securityDesc');
+    const primaryCrackTimeElement = document.getElementById('primaryCrackTime');
+    
+    if (primaryCrackTimeElement) {
+        primaryCrackTimeElement.textContent = primaryCrackTime;
+    }
+    
+    // Update security assessment based on crack time
+    const riskClass = getRiskClass(primaryCrackTime);
+    let icon, title, desc, iconColor;
+    
+    switch (riskClass) {
+        case 'risk-critical':
+            icon = 'bi-shield-x';
+            title = 'Critical Risk';
+            desc = 'This password can be cracked almost immediately';
+            iconColor = '#dc3545';
+            break;
+        case 'risk-high':
+            icon = 'bi-shield-exclamation';
+            title = 'High Risk';
+            desc = 'This password could be cracked within hours or days';
+            iconColor = '#fd7e14';
+            break;
+        case 'risk-medium':
+            icon = 'bi-shield-minus';
+            title = 'Medium Security';
+            desc = 'This password provides moderate protection against attacks';
+            iconColor = '#ffc107';
+            break;
+        case 'risk-low':
+            icon = 'bi-shield-check';
+            title = 'Strong Security';
+            desc = 'This password would take years or centuries to crack';
+            iconColor = '#198754';
+            break;
+        default:
+            icon = 'bi-shield';
+            title = 'Unknown Security';
+            desc = 'Unable to determine security level';
+            iconColor = '#6c757d';
+    }
+    
+    if (securityIcon) {
+        securityIcon.innerHTML = `<i class="bi ${icon}" style="font-size: 3rem; color: ${iconColor};"></i>`;
+    }
+    if (securityTitle) {
+        securityTitle.textContent = title;
+        securityTitle.style.color = iconColor;
+    }
+    if (securityDesc) {
+        securityDesc.textContent = desc;
+    }
 }
 
 async function generatePassword() {

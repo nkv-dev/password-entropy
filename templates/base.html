@@ -79,44 +79,106 @@
 
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Estimated Crack Times</h5>
+                        <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> Security Analysis</h5>
                     </div>
                     <div class="card-body">
+                        <!-- Summary Security Indicator -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="security-summary-card p-4 rounded text-center" id="securitySummary">
+                                    <div class="security-icon mb-2" id="securityIcon">
+                                        <i class="bi bi-shield-check" style="font-size: 3rem; color: #198754;"></i>
+                                    </div>
+                                    <h4 class="security-title mb-1" id="securityTitle">Strong Password</h4>
+                                    <p class="security-desc mb-2" id="securityDesc">This password would take years to crack with modern computers</p>
+                                    <div class="security-metric" id="securityMetric">
+                                        <span class="metric-value" id="primaryCrackTime">-</span>
+                                        <span class="metric-label">with online attacks</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Crack Times -->
                         <div class="row g-3" id="crackTimesSection">
                             <div class="col-md-6 col-lg-3">
                                 <div class="crack-time-card p-3 rounded">
-                                    <div class="small text-muted mb-1">
-                                        <i class="bi bi-globe"></i> Online (Throttled)
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="small text-muted">
+                                            <i class="bi bi-globe"></i> Online (Throttled)
+                                        </div>
+                                        <div class="risk-indicator" id="riskOnlineThrottled">
+                                            <span class="risk-dot"></span>
+                                        </div>
                                     </div>
-                                    <div class="fw-semibold" id="timeOnlineThrottled">-</div>
-                                    <div class="small text-muted">100/hour</div>
+                                    <div class="fw-semibold crack-time-value" id="timeOnlineThrottled">-</div>
+                                    <div class="small text-muted">100 attempts/hour</div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-3">
                                 <div class="crack-time-card p-3 rounded">
-                                    <div class="small text-muted mb-1">
-                                        <i class="bi bi-globe"></i> Online (Unthrottled)
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="small text-muted">
+                                            <i class="bi bi-globe"></i> Online (Unthrottled)
+                                        </div>
+                                        <div class="risk-indicator" id="riskOnlineNoThrottle">
+                                            <span class="risk-dot"></span>
+                                        </div>
                                     </div>
-                                    <div class="fw-semibold" id="timeOnlineNoThrottle">-</div>
-                                    <div class="small text-muted">10/second</div>
+                                    <div class="fw-semibold crack-time-value" id="timeOnlineNoThrottle">-</div>
+                                    <div class="small text-muted">10 attempts/second</div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-3">
                                 <div class="crack-time-card p-3 rounded">
-                                    <div class="small text-muted mb-1">
-                                        <i class="bi bi-hdd"></i> Offline (Slow Hash)
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="small text-muted">
+                                            <i class="bi bi-hdd"></i> Offline (Slow Hash)
+                                        </div>
+                                        <div class="risk-indicator" id="riskOfflineSlow">
+                                            <span class="risk-dot"></span>
+                                        </div>
                                     </div>
-                                    <div class="fw-semibold" id="timeOfflineSlow">-</div>
-                                    <div class="small text-muted">10K/second</div>
+                                    <div class="fw-semibold crack-time-value" id="timeOfflineSlow">-</div>
+                                    <div class="small text-muted">10,000 attempts/second</div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-3">
                                 <div class="crack-time-card p-3 rounded">
-                                    <div class="small text-muted mb-1">
-                                        <i class="bi bi-hdd-network"></i> Offline (Fast Hash)
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="small text-muted">
+                                            <i class="bi bi-hdd-network"></i> Offline (Fast Hash)
+                                        </div>
+                                        <div class="risk-indicator" id="riskOfflineFast">
+                                            <span class="risk-dot"></span>
+                                        </div>
                                     </div>
-                                    <div class="fw-semibold" id="timeOfflineFast">-</div>
-                                    <div class="small text-muted">10B/second</div>
+                                    <div class="fw-semibold crack-time-value" id="timeOfflineFast">-</div>
+                                    <div class="small text-muted">10 billion attempts/second</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Legend -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="security-legend d-flex justify-content-center gap-3">
+                                    <div class="legend-item">
+                                        <span class="legend-dot risk-low"></span>
+                                        <span class="legend-text">Low Risk</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot risk-medium"></span>
+                                        <span class="legend-text">Medium Risk</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot risk-high"></span>
+                                        <span class="legend-text">High Risk</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot risk-critical"></span>
+                                        <span class="legend-text">Critical Risk</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

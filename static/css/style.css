@@ -149,7 +149,145 @@ body {
 .crack-time-card {
     background-color: var(--crack-time-bg);
     border: 1px solid var(--border-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.crack-time-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.crack-time-value {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+/* Security Summary Card */
+.security-summary-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--crack-time-bg) 100%);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.security-summary-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.security-icon {
+    transition: transform 0.3s ease;
+}
+
+.security-summary-card:hover .security-icon {
+    transform: scale(1.1);
+}
+
+.security-title {
+    color: var(--text-color);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.security-desc {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.security-metric {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+.metric-value {
+    color: #198754;
+    font-weight: 700;
+}
+
+.metric-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Risk Indicators */
+.risk-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.risk-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.risk-low {
+    background-color: #198754;
+    box-shadow: 0 0 6px rgba(25, 135, 84, 0.4);
+}
+
+.risk-medium {
+    background-color: #ffc107;
+    box-shadow: 0 0 6px rgba(255, 193, 7, 0.4);
+}
+
+.risk-high {
+    background-color: #fd7e14;
+    box-shadow: 0 0 6px rgba(253, 126, 20, 0.4);
+}
+
+.risk-critical {
+    background-color: #dc3545;
+    box-shadow: 0 0 6px rgba(220, 53, 69, 0.4);
+}
+
+/* Security Legend */
+.security-legend {
+    padding: 1rem;
+    background-color: var(--crack-time-bg);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* Animation for crack time updates */
+.crack-time-card.updated {
+    animation: crackTimeUpdate 0.6s ease-in-out;
+}
+
+@keyframes crackTimeUpdate {
+    0% {
+        transform: scale(1);
+        border-color: var(--border-color);
+    }
+    50% {
+        transform: scale(1.02);
+        border-color: #0d6efd;
+        box-shadow: 0 0 16px rgba(13, 110, 253, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        border-color: var(--border-color);
+    }
 }
 
 footer {
