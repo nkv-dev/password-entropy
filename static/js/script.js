@@ -362,12 +362,12 @@ function showNotification(message, type = 'info') {
 }
 
 async function copyPassword() {
-    const password = document.getElementById('generatedPassword').value;
+    const password = document.getElementById('generatedPassword').textContent;
     if (!password) return;
     
     try {
         await navigator.clipboard.writeText(password);
-        const btn = document.querySelector('#generatedPasswordSection .btn-outline-primary');
+        const btn = document.querySelector('#generatedPasswordSection .btn-primary');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
         setTimeout(() => {
@@ -375,6 +375,7 @@ async function copyPassword() {
         }, 2000);
     } catch (error) {
         console.error('Error copying to clipboard:', error);
+        showNotification('Failed to copy password to clipboard', 'danger');
     }
 }
 
