@@ -2,6 +2,19 @@ let currentPassword = '';
 let autoGenerateEnabled = true;
 let lastGeneratedPassword = '';
 
+function updateRangeValue(element, value) {
+    // Update text content
+    element.textContent = value;
+    
+    // Add animation class
+    element.classList.add('updated');
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+        element.classList.remove('updated');
+    }, 600);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initTheme();
     initPasswordGenerator();
@@ -28,10 +41,8 @@ function initPasswordGenerator() {
     }
     
     lengthSlider.addEventListener('input', function(e) {
-        console.log('Length slider moved to:', e.target.value);
-        lengthValue.textContent = e.target.value;
+        updateRangeValue(lengthValue, e.target.value);
         if (autoGenerateEnabled) {
-            console.log('Auto-generating password...');
             debouncedGeneratePassword();
         }
     });
@@ -46,10 +57,8 @@ function initPasswordGenerator() {
     }
     
     entropySlider.addEventListener('input', function(e) {
-        console.log('Entropy slider moved to:', e.target.value);
-        entropyDisplay.textContent = e.target.value;
+        updateRangeValue(entropyDisplay, e.target.value);
         if (autoGenerateEnabled) {
-            console.log('Auto-generating password...');
             debouncedGeneratePassword();
         }
     });
@@ -91,7 +100,7 @@ function setEntropy(value) {
     const entropyDisplay = document.getElementById('entropyDisplay');
     
     entropySlider.value = value;
-    entropyDisplay.textContent = value;
+    updateRangeValue(entropyDisplay, value);
     
     if (autoGenerateEnabled) {
         generatePassword();
@@ -222,7 +231,7 @@ function displayResults(data, zxcvbnResult) {
     scoreCircle.className = 'score-circle score-' + data.score;
     
     document.getElementById('entropyValue').textContent = data.entropy.toFixed(2);
-    document.getElementById('lengthValue').textContent = data.password_length;
+    document.getElementById('analyzedLengthValue').textContent = data.password_length;
     
     const strengthBar = document.getElementById('strengthBar');
     const barWidth = Math.min((data.score + 1) * 20, 100);
@@ -274,8 +283,7 @@ async function generatePassword() {
     const useUppercase = document.getElementById('useUppercase').checked;
     const useDigits = document.getElementById('useDigits').checked;
     const useSymbols = document.getElementById('useSymbols').checked;
-    
-    console.log('Generating with length:', passwordLength, 'entropy:', targetEntropy);
+
     
     if (!useLowercase && !useUppercase && !useDigits && !useSymbols) {
         // Show warning but don't use alert for better UX
@@ -297,8 +305,7 @@ async function generatePassword() {
         const passwordLength = document.getElementById('passwordLength').value;
         const targetEntropy = document.getElementById('targetEntropy').value;
         
-        console.log('Password length slider value:', passwordLength);
-        console.log('Target entropy slider value:', targetEntropy);
+
         
         const response = await fetch('/api/generate/', {
             method: 'POST',
