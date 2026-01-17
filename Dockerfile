@@ -2,20 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files first for better caching
+# Install dependencies first for better layer caching
 COPY package*.json ./
+RUN npm ci --omit=dev --silent && npm cache clean --force
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Copy application code and set ownership
+COPY --chown=node:node . .
 
-# Copy application code
-COPY . .
-
-# Create non-root user for security
-RUN addgroup -g node -S && adduser -S node -G node
-
-# Change ownership to non-root user
-RUN chown -R node:node /app
+# Create non-root user (if not exists)
+RUN addgroup -S node && adduser -S -G node node
 
 USER node
 
