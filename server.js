@@ -93,7 +93,7 @@ function calculateCrackTime(entropy, attemptsPerSecond) {
 }
 
 function generateSecurePassword(targetEntropy, options) {
-    const { useLowercase, useUppercase, useDigits, useSymbols } = options;
+    const { useLowercase, useUppercase, useDigits, useSymbols, targetLength } = options;
     
     let charPool = '';
     const lowercase = 'abcdefghijklmnopqrstuvwxyz';
@@ -109,7 +109,17 @@ function generateSecurePassword(targetEntropy, options) {
     if (!charPool) throw new Error('At least one character type must be selected');
     
     const poolSize = charPool.length;
-    let length = Math.max(8, Math.ceil(targetEntropy / Math.log2(poolSize)));
+    let length;
+    
+    // Use target length if provided, otherwise calculate based on entropy
+    if (targetLength) {
+        length = parseInt(targetLength);
+    } else {
+        length = Math.max(8, Math.ceil(targetEntropy / Math.log2(poolSize)));
+    }
+    
+    // Ensure length is within reasonable bounds
+    length = Math.max(5, Math.min(length, 128));
     
     while (true) {
         const password = [];
@@ -121,7 +131,28 @@ function generateSecurePassword(targetEntropy, options) {
         const generatedPassword = password.join('');
         const entropy = calculateEntropy(generatedPassword);
         
+        // If target length is specified, accept the password regardless of entropy
+        if (targetLength) {
+            return {
+                password: generatedPassword,
+                length: length,
+                entropy: entropy
+            };
+        }
+        
+        // Otherwise, ensure minimum entropy requirement is met
         if (entropy >= targetEntropy) {
+            return {
+                password: generatedPassword,
+                length: length,
+                entropy: entropy
+            };
+        }
+        
+        // If not meeting entropy target, try longer password
+        length++;
+        if (length > 128) {
+            // If we've reached max length, return current password
             return {
                 password: generatedPassword,
                 length: length,
@@ -166,13 +197,14 @@ app.post('/api/analyze/', (req, res) => {
 });
 
 app.post('/api/generate/', (req, res) => {
-    const { target_entropy, use_lowercase, use_uppercase, use_digits, use_symbols } = req.body;
+    const { target_entropy, use_lowercase, use_uppercase, use_digits, use_symbols, password_length } = req.body;
     
     const options = {
         useLowercase: use_lowercase !== false,
         useUppercase: use_uppercase !== false,
         useDigits: use_digits !== false,
-        useSymbols: use_symbols !== false
+        useSymbols: use_symbols !== false,
+        targetLength: password_length ? parseInt(password_length) : null
     };
     
     try {

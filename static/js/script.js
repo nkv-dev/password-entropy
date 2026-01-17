@@ -1,7 +1,10 @@
 let currentPassword = '';
+let autoGenerateEnabled = true;
+let lastGeneratedPassword = '';
 
 document.addEventListener('DOMContentLoaded', function() {
     initTheme();
+    initPasswordGenerator();
     
     const passwordInput = document.getElementById('passwordInput');
     passwordInput.addEventListener('input', debounce(analyzePassword, 300));
@@ -13,6 +16,118 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('passwordEye').classList.toggle('bi-eye-slash');
     });
 });
+
+function initPasswordGenerator() {
+    // Length slider
+    const lengthSlider = document.getElementById('passwordLength');
+    const lengthValue = document.getElementById('lengthValue');
+    
+    lengthSlider.addEventListener('input', function() {
+        lengthValue.textContent = this.value;
+        if (autoGenerateEnabled) {
+            debouncedGeneratePassword();
+        }
+    });
+    
+    // Entropy slider
+    const entropySlider = document.getElementById('targetEntropy');
+    const entropyDisplay = document.getElementById('entropyDisplay');
+    
+    entropySlider.addEventListener('input', function() {
+        entropyDisplay.textContent = this.value;
+        if (autoGenerateEnabled) {
+            debouncedGeneratePassword();
+        }
+    });
+    
+    // Character type toggles
+    const charTypes = ['useLowercase', 'useUppercase', 'useDigits', 'useSymbols'];
+    charTypes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        const card = checkbox.closest('.char-type-card');
+        
+        checkbox.addEventListener('change', function() {
+            card.classList.toggle('active', this.checked);
+            if (autoGenerateEnabled) {
+                debouncedGeneratePassword();
+            }
+        });
+        
+        // Card click handler
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('label')) {
+                checkbox.checked = !checkbox.checked;
+                card.classList.toggle('active', checkbox.checked);
+                if (autoGenerateEnabled) {
+                    debouncedGeneratePassword();
+                }
+            }
+        });
+    });
+    
+    // Generate initial password
+    setTimeout(() => generatePassword(), 500);
+}
+
+// Debounced password generation for sliders
+const debouncedGeneratePassword = debounce(generatePassword, 500);
+
+function setEntropy(value) {
+    const entropySlider = document.getElementById('targetEntropy');
+    const entropyDisplay = document.getElementById('entropyDisplay');
+    
+    entropySlider.value = value;
+    entropyDisplay.textContent = value;
+    
+    if (autoGenerateEnabled) {
+        generatePassword();
+    }
+}
+
+function selectAllChars() {
+    const checkboxes = ['useLowercase', 'useUppercase', 'useDigits', 'useSymbols'];
+    checkboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        const card = checkbox.closest('.char-type-card');
+        checkbox.checked = true;
+        card.classList.add('active');
+    });
+    
+    if (autoGenerateEnabled) {
+        debouncedGeneratePassword();
+    }
+}
+
+function selectNoneChars() {
+    const checkboxes = ['useLowercase', 'useUppercase', 'useDigits', 'useSymbols'];
+    checkboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        const card = checkbox.closest('.char-type-card');
+        checkbox.checked = false;
+        card.classList.remove('active');
+    });
+}
+
+function regeneratePassword() {
+    autoGenerateEnabled = true;
+    generatePassword();
+}
+
+function getPasswordStrengthText(entropy) {
+    if (entropy < 40) return 'Very Weak';
+    if (entropy < 60) return 'Weak';
+    if (entropy < 80) return 'Moderate';
+    if (entropy < 100) return 'Strong';
+    return 'Very Strong';
+}
+
+function getPasswordStrengthClass(entropy) {
+    if (entropy < 40) return 'strength-very-weak';
+    if (entropy < 60) return 'strength-weak';
+    if (entropy < 80) return 'strength-moderate';
+    if (entropy < 100) return 'strength-strong';
+    return 'strength-very-strong';
+}
 
 function debounce(func, wait) {
     let timeout;
@@ -139,20 +254,27 @@ function updateCrackTimes(crackTimes) {
 
 async function generatePassword() {
     const targetEntropy = document.getElementById('targetEntropy').value;
+    const passwordLength = document.getElementById('passwordLength').value;
     const useLowercase = document.getElementById('useLowercase').checked;
     const useUppercase = document.getElementById('useUppercase').checked;
     const useDigits = document.getElementById('useDigits').checked;
     const useSymbols = document.getElementById('useSymbols').checked;
     
     if (!useLowercase && !useUppercase && !useDigits && !useSymbols) {
-        alert('Please select at least one character type');
+        // Show warning but don't use alert for better UX
+        showNotification('Please select at least one character type', 'warning');
         return;
     }
     
     const generateBtn = document.querySelector('button[onclick="generatePassword()"]');
     const originalBtnText = generateBtn.innerHTML;
-    generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Generating...';
-    generateBtn.disabled = true;
+    
+    // Only show loading state for manual generation, not auto-generation
+    const isManualGeneration = !autoGenerateEnabled;
+    if (isManualGeneration) {
+        generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Generating...';
+        generateBtn.disabled = true;
+    }
     
     try {
         const response = await fetch('/api/generate/', {
@@ -169,30 +291,74 @@ async function generatePassword() {
             })
         });
         
-        console.log('Response status:', response.status);
-        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Response data:', data);
         
+        // Store the generated password
+        lastGeneratedPassword = data.password;
+        
+        // Update UI elements
         const section = document.getElementById('generatedPasswordSection');
+        const container = section.querySelector('.password-display-container');
+        
         section.classList.remove('d-none');
-        document.getElementById('generatedPassword').value = data.password;
-        document.getElementById('generatedEntropy').textContent = data.entropy.toFixed(2);
-        document.getElementById('generatedLength').textContent = data.length;
+        
+        // Update password display
+        const passwordDisplay = document.getElementById('generatedPassword');
+        passwordDisplay.textContent = data.password;
+        
+        // Update strength indicators
+        const entropyDisplay = document.getElementById('generatedEntropy');
+        const lengthDisplay = document.getElementById('generatedLength');
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const strengthText = document.getElementById('passwordStrengthText');
+        
+        entropyDisplay.textContent = data.entropy.toFixed(2);
+        lengthDisplay.textContent = data.length;
+        strengthText.textContent = getPasswordStrengthText(data.entropy);
+        
+        // Update strength bar
+        strengthBar.className = 'password-strength-fill ' + getPasswordStrengthClass(data.entropy);
+        
+        // Add animation effect
+        container.classList.add('generated');
+        setTimeout(() => container.classList.remove('generated'), 500);
         
         updateCrackTimes(data.crack_times);
         
     } catch (error) {
         console.error('Error generating password:', error);
-        alert('Error generating password: ' + error.message + '\nCheck console for details.');
+        showNotification('Error generating password: ' + error.message, 'danger');
     } finally {
-        generateBtn.innerHTML = originalBtnText;
-        generateBtn.disabled = false;
+        if (isManualGeneration) {
+            generateBtn.innerHTML = originalBtnText;
+            generateBtn.disabled = false;
+        }
     }
+}
+
+function showNotification(message, type = 'info') {
+    // Create a toast notification instead of alert
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+    toast.style.zIndex = '9999';
+    toast.style.minWidth = '300px';
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="bi bi-${type === 'warning' ? 'exclamation-triangle' : type === 'danger' ? 'x-circle' : 'info-circle'} me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 }
 
 async function copyPassword() {

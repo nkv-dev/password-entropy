@@ -129,57 +129,155 @@
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info mb-4">
-                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> What is Target Entropy?</h6>
-                            <p class="mb-0 small">Entropy measures password unpredictability in <strong>bits</strong>. Higher entropy = harder to crack. The generator creates a password with at least the specified entropy level based on your chosen character types.</p>
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Advanced Password Generator</h6>
+                            <p class="mb-0 small">Generate secure passwords with customizable length and entropy. Higher entropy = harder to crack. Use sliders for real-time feedback.</p>
                         </div>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Target Entropy (bits)</label>
-                                <input type="number" class="form-control" id="targetEntropy" value="60" min="20" max="200">
-                                <div class="form-text">
-                                    Quick presets: 
-                                    <a href="#" onclick="setEntropy(50); return false;">50 bits</a> | 
-                                    <a href="#" onclick="setEntropy(60); return false;">60 bits</a> | 
-                                    <a href="#" onclick="setEntropy(80); return false;">80 bits</a> | 
-                                    <a href="#" onclick="setEntropy(100); return false;">100 bits</a>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Character Types</label>
-                                <div class="d-flex flex-wrap gap-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="useLowercase" checked>
-                                        <label class="form-check-label" for="useLowercase">Lowercase</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="useUppercase" checked>
-                                        <label class="form-check-label" for="useUppercase">Uppercase</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="useDigits" checked>
-                                        <label class="form-check-label" for="useDigits">Numbers</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="useSymbols" checked>
-                                        <label class="form-check-label" for="useSymbols">Symbols</label>
-                                    </div>
-                                </div>
+                        
+                        <!-- Password Length Control -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                                <span>Password Length</span>
+                                <span class="range-value" id="lengthValue">14</span>
+                            </label>
+                            <input type="range" class="range-slider" id="passwordLength" min="5" max="128" value="14">
+                            <div class="form-text d-flex justify-content-between mt-1">
+                                <span>5 chars</span>
+                                <span>128 chars</span>
                             </div>
                         </div>
-                        <div class="mt-4">
-                            <button class="btn btn-primary btn-lg" onclick="generatePassword()">
-                                <i class="bi bi-star"></i> Generate Password
-                            </button>
+
+                        <!-- Target Entropy Control -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                                <span>Target Entropy</span>
+                                <span class="range-value" id="entropyDisplay">60</span>
+                            </label>
+                            <input type="range" class="range-slider" id="targetEntropy" min="20" max="200" value="60">
+                            <div class="form-text d-flex justify-content-between mt-1">
+                                <span>20 bits</span>
+                                <span>200 bits</span>
+                            </div>
+                            <div class="quick-actions mt-2">
+                                <button type="button" class="quick-action-btn" onclick="setEntropy(40)">Weak (40)</button>
+                                <button type="button" class="quick-action-btn" onclick="setEntropy(60)">Fair (60)</button>
+                                <button type="button" class="quick-action-btn" onclick="setEntropy(80)">Good (80)</button>
+                                <button type="button" class="quick-action-btn" onclick="setEntropy(100)">Strong (100)</button>
+                            </div>
                         </div>
-                        <div id="generatedPasswordSection" class="mt-4 d-none">
-                            <div class="input-group input-group-lg">
-                                <input type="text" class="form-control font-monospace" id="generatedPassword" readonly>
-                                <button class="btn btn-outline-primary" type="button" onclick="copyPassword()">
-                                    <i class="bi bi-clipboard"></i> Copy
+
+                        <!-- Character Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Character Types</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="char-type-card active" data-type="lowercase">
+                                        <div class="char-type-header">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="useLowercase" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <div class="char-type-icon">
+                                                <i class="bi bi-type"></i>
+                                            </div>
+                                            <span class="char-type-title">Lowercase</span>
+                                            <span class="char-type-count">26</span>
+                                        </div>
+                                        <div class="char-type-chars">abcdefghijklmnopqrstuvwxyz</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="char-type-card active" data-type="uppercase">
+                                        <div class="char-type-header">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="useUppercase" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <div class="char-type-icon">
+                                                <i class="bi bi-type-bold"></i>
+                                            </div>
+                                            <span class="char-type-title">Uppercase</span>
+                                            <span class="char-type-count">26</span>
+                                        </div>
+                                        <div class="char-type-chars">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="char-type-card active" data-type="digits">
+                                        <div class="char-type-header">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="useDigits" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <div class="char-type-icon">
+                                                <i class="bi bi-123"></i>
+                                            </div>
+                                            <span class="char-type-title">Numbers</span>
+                                            <span class="char-type-count">10</span>
+                                        </div>
+                                        <div class="char-type-chars">0123456789</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="char-type-card active" data-type="symbols">
+                                        <div class="char-type-header">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="useSymbols" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <div class="char-type-icon">
+                                                <i class="bi bi-exclamation-circle"></i>
+                                            </div>
+                                            <span class="char-type-title">Symbols</span>
+                                            <span class="char-type-count">32</span>
+                                        </div>
+                                        <div class="char-type-chars">!@#$%^&*()_+-=[]{}|;:,.<>?</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="quick-actions mt-3">
+                                <button type="button" class="quick-action-btn" onclick="selectAllChars()">
+                                    <i class="bi bi-check-all"></i> Select All
+                                </button>
+                                <button type="button" class="quick-action-btn" onclick="selectNoneChars()">
+                                    <i class="bi bi-x-circle"></i> Select None
                                 </button>
                             </div>
-                            <div class="mt-2 small text-muted">
-                                Entropy: <span id="generatedEntropy">-</span> bits | Length: <span id="generatedLength">-</span>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <div class="text-center">
+                            <button class="btn btn-primary btn-lg px-5" onclick="generatePassword()">
+                                <i class="bi bi-stars"></i> Generate Password
+                            </button>
+                        </div>
+
+                        <!-- Enhanced Password Display -->
+                        <div id="generatedPasswordSection" class="mt-4 d-none">
+                            <div class="password-display-container">
+                                <div class="text-center mb-2">
+                                    <h6 class="text-muted mb-2">Generated Password</h6>
+                                    <div class="password-text" id="generatedPassword"></div>
+                                </div>
+                                
+                                <div class="password-strength-bar">
+                                    <div class="password-strength-fill" id="passwordStrengthBar"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="small text-muted">
+                                        <span id="passwordStrengthText">-</span> • 
+                                        <span id="generatedEntropy">-</span> bits • 
+                                        <span id="generatedLength">-</span> chars
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline-primary btn-sm me-2" onclick="regeneratePassword()">
+                                            <i class="bi bi-arrow-clockwise"></i> Regenerate
+                                        </button>
+                                        <button class="btn btn-primary btn-sm" onclick="copyPassword()">
+                                            <i class="bi bi-clipboard"></i> Copy
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
