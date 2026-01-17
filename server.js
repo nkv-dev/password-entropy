@@ -4,11 +4,23 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static('static'));
+// Production optimizations
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' ? false : true,
+    credentials: true
+}));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.static('static', {
+    maxAge: process.env.NODE_ENV === 'production' ? '1y' : '0',
+    etag: true
+}));
 
 function calculateEntropy(password) {
     if (!password) return 0.0;
@@ -226,6 +238,15 @@ app.post('/api/generate/', (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
+});
+
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
 });
 
 app.listen(PORT, () => {
