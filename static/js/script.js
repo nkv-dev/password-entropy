@@ -530,6 +530,40 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+async function checkEntropy() {
+    const generatedPassword = document.getElementById('generatedPassword').textContent;
+    if (!generatedPassword) {
+        showNotification('No password generated to check', 'warning');
+        return;
+    }
+    
+    // Paste the password to the input field
+    const passwordInput = document.getElementById('passwordInput');
+    passwordInput.value = generatedPassword;
+    
+    // Show loading state on the button
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Analyzing...';
+    btn.disabled = true;
+    
+    // Trigger analysis immediately (no debounce for manual check)
+    analyzePassword();
+    
+    // Scroll to the analysis section
+    document.getElementById('passwordInput').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+    });
+    
+    // Reset button after analysis completes
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showNotification('Password analyzed successfully!', 'success');
+    }, 1000);
+}
+
 async function copyPassword() {
     const password = document.getElementById('generatedPassword').textContent;
     if (!password) return;
