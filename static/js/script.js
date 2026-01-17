@@ -277,6 +277,12 @@ async function generatePassword() {
     }
     
     try {
+        const passwordLength = document.getElementById('passwordLength').value;
+        const targetEntropy = document.getElementById('targetEntropy').value;
+        
+        console.log('Password length slider value:', passwordLength);
+        console.log('Target entropy slider value:', targetEntropy);
+        
         const response = await fetch('/api/generate/', {
             method: 'POST',
             headers: {
@@ -284,6 +290,7 @@ async function generatePassword() {
             },
             body: JSON.stringify({
                 target_entropy: targetEntropy,
+                password_length: passwordLength,
                 use_lowercase: useLowercase,
                 use_uppercase: useUppercase,
                 use_digits: useDigits,
