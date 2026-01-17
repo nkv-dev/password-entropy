@@ -22,9 +22,16 @@ function initPasswordGenerator() {
     const lengthSlider = document.getElementById('passwordLength');
     const lengthValue = document.getElementById('lengthValue');
     
-    lengthSlider.addEventListener('input', function() {
-        lengthValue.textContent = this.value;
+    if (!lengthSlider || !lengthValue) {
+        console.error('Length slider elements not found!');
+        return;
+    }
+    
+    lengthSlider.addEventListener('input', function(e) {
+        console.log('Length slider moved to:', e.target.value);
+        lengthValue.textContent = e.target.value;
         if (autoGenerateEnabled) {
+            console.log('Auto-generating password...');
             debouncedGeneratePassword();
         }
     });
@@ -33,9 +40,16 @@ function initPasswordGenerator() {
     const entropySlider = document.getElementById('targetEntropy');
     const entropyDisplay = document.getElementById('entropyDisplay');
     
-    entropySlider.addEventListener('input', function() {
-        entropyDisplay.textContent = this.value;
+    if (!entropySlider || !entropyDisplay) {
+        console.error('Entropy slider elements not found!');
+        return;
+    }
+    
+    entropySlider.addEventListener('input', function(e) {
+        console.log('Entropy slider moved to:', e.target.value);
+        entropyDisplay.textContent = e.target.value;
         if (autoGenerateEnabled) {
+            console.log('Auto-generating password...');
             debouncedGeneratePassword();
         }
     });
