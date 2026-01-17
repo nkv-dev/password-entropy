@@ -20,11 +20,41 @@
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* Performance optimizations */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
+    will-change: background-color, color;
+    transform: translateZ(0); /* Hardware acceleration */
+}
+
+/* Optimize rendering for frequently updated elements */
+.score-circle,
+.stat-value,
+.range-value,
+.crack-time-value,
+.password-text {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
+
+/* Optimize animations */
+.card,
+.crack-time-card,
+.strength-preset-btn,
+.password-display-container {
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .navbar {
@@ -417,7 +447,7 @@ footer {
 }
 
 .range-value.updated {
-    animation: pulseHighlight 0.6s ease-in-out;
+    animation: pulseHighlight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes pulseHighlight {
@@ -434,6 +464,15 @@ footer {
         transform: scale(1);
         background: #0d6efd;
     }
+}
+
+/* Optimize animations for better performance */
+.range-value,
+.crack-time-card,
+.strength-preset-btn,
+.password-display-container {
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 /* Toggle Switches */

@@ -3,24 +3,41 @@ let autoGenerateEnabled = true;
 let lastGeneratedPassword = '';
 
 function updateRangeValue(element, value) {
-    // Update text content
-    element.textContent = value;
-    
-    // Add animation class
-    element.classList.add('updated');
-    
-    // Remove animation class after animation completes
-    setTimeout(() => {
-        element.classList.remove('updated');
-    }, 600);
+    // Use requestAnimationFrame for smooth updates
+    requestAnimationFrame(() => {
+        // Update text content
+        element.textContent = value;
+        
+        // Add animation class
+        element.classList.add('updated');
+        
+        // Remove animation class after animation completes
+        setTimeout(() => {
+            element.classList.remove('updated');
+        }, 600);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Performance monitoring
+    if ('performance' in window) {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        console.log(`Page load time: ${perfData.loadEventEnd - perfData.loadEventStart}ms`);
+    }
+    
     initTheme();
     initPasswordGenerator();
     
     const passwordInput = document.getElementById('passwordInput');
-    passwordInput.addEventListener('input', debounce(analyzePassword, 300));
+    
+    // Optimized event listener with requestAnimationFrame
+    let inputTimeout;
+    passwordInput.addEventListener('input', function(e) {
+        clearTimeout(inputTimeout);
+        inputTimeout = setTimeout(() => {
+            requestAnimationFrame(analyzePassword);
+        }, 300);
+    });
     
     document.getElementById('togglePassword').addEventListener('click', function() {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -79,8 +96,14 @@ function initPasswordGenerator() {
     setTimeout(() => generatePassword(), 500);
 }
 
-// Debounced password generation for sliders
-const debouncedGeneratePassword = debounce(generatePassword, 500);
+// Optimized debounced password generation with requestAnimationFrame
+let generateTimeout;
+function debouncedGeneratePassword() {
+    clearTimeout(generateTimeout);
+    generateTimeout = setTimeout(() => {
+        requestAnimationFrame(generatePassword);
+    }, 500);
+}
 
 function initStrengthPresets() {
     // Set default preset
