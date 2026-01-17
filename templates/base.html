@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Entropy Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-body">
+    <nav class="navbar navbar-expand-lg navbar-theme">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-lock"></i> Password Entropy Tool
+            </a>
+            <button class="btn btn-outline-theme" id="themeToggle" onclick="toggleTheme()">
+                <i class="bi bi-moon-fill" id="themeIcon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-3">Password Entropy Analyzer</h1>
+                    <p class="lead text-muted">Check your password strength and generate secure passwords</p>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <label for="passwordInput" class="form-label fw-semibold">Enter Password</label>
+                        <div class="input-group input-group-lg mb-3">
+                            <input type="password" class="form-control" id="passwordInput" placeholder="Type your password..." autocomplete="off">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="bi bi-eye" id="passwordEye"></i>
+                            </button>
+                        </div>
+
+                        <div id="resultsSection" class="d-none">
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="score-display text-center">
+                                        <div class="score-circle mb-2" id="scoreCircle">0</div>
+                                        <div class="small text-muted">Strength Score</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-display text-center">
+                                        <div class="stat-value" id="entropyValue">0</div>
+                                        <div class="small text-muted">Bits of Entropy</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-display text-center">
+                                        <div class="stat-value" id="lengthValue">0</div>
+                                        <div class="small text-muted">Characters</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="progress mb-3" style="height: 10px;">
+                                <div class="progress-bar" id="strengthBar" role="progressbar" style="width: 0%"></div>
+                            </div>
+
+                            <div class="alert" id="feedbackAlert" style="display: none;">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+                                    <div>
+                                        <div id="feedbackWarning" class="fw-semibold"></div>
+                                        <ul id="feedbackSuggestions" class="mb-0 small"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Estimated Crack Times</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3" id="crackTimesSection">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="crack-time-card p-3 rounded">
+                                    <div class="small text-muted mb-1">
+                                        <i class="bi bi-globe"></i> Online (Throttled)
+                                    </div>
+                                    <div class="fw-semibold" id="timeOnlineThrottled">-</div>
+                                    <div class="small text-muted">100/hour</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="crack-time-card p-3 rounded">
+                                    <div class="small text-muted mb-1">
+                                        <i class="bi bi-globe"></i> Online (Unthrottled)
+                                    </div>
+                                    <div class="fw-semibold" id="timeOnlineNoThrottle">-</div>
+                                    <div class="small text-muted">10/second</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="crack-time-card p-3 rounded">
+                                    <div class="small text-muted mb-1">
+                                        <i class="bi bi-hdd"></i> Offline (Slow Hash)
+                                    </div>
+                                    <div class="fw-semibold" id="timeOfflineSlow">-</div>
+                                    <div class="small text-muted">10K/second</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="crack-time-card p-3 rounded">
+                                    <div class="small text-muted mb-1">
+                                        <i class="bi bi-hdd-network"></i> Offline (Fast Hash)
+                                    </div>
+                                    <div class="fw-semibold" id="timeOfflineFast">-</div>
+                                    <div class="small text-muted">10B/second</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-key"></i> Password Generator</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> What is Target Entropy?</h6>
+                            <p class="mb-0 small">Entropy measures password unpredictability in <strong>bits</strong>. Higher entropy = harder to crack. The generator creates a password with at least the specified entropy level based on your chosen character types.</p>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Target Entropy (bits)</label>
+                                <input type="number" class="form-control" id="targetEntropy" value="60" min="20" max="200">
+                                <div class="form-text">
+                                    Quick presets: 
+                                    <a href="#" onclick="setEntropy(50); return false;">50 bits</a> | 
+                                    <a href="#" onclick="setEntropy(60); return false;">60 bits</a> | 
+                                    <a href="#" onclick="setEntropy(80); return false;">80 bits</a> | 
+                                    <a href="#" onclick="setEntropy(100); return false;">100 bits</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Character Types</label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useLowercase" checked>
+                                        <label class="form-check-label" for="useLowercase">Lowercase</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useUppercase" checked>
+                                        <label class="form-check-label" for="useUppercase">Uppercase</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useDigits" checked>
+                                        <label class="form-check-label" for="useDigits">Numbers</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useSymbols" checked>
+                                        <label class="form-check-label" for="useSymbols">Symbols</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-primary btn-lg" onclick="generatePassword()">
+                                <i class="bi bi-star"></i> Generate Password
+                            </button>
+                        </div>
+                        <div id="generatedPasswordSection" class="mt-4 d-none">
+                            <div class="input-group input-group-lg">
+                                <input type="text" class="form-control font-monospace" id="generatedPassword" readonly>
+                                <button class="btn btn-outline-primary" type="button" onclick="copyPassword()">
+                                    <i class="bi bi-clipboard"></i> Copy
+                                </button>
+                            </div>
+                            <div class="mt-2 small text-muted">
+                                Entropy: <span id="generatedEntropy">-</span> bits | Length: <span id="generatedLength">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Understanding Password Entropy</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-question-circle"></i> What is Entropy?</h6>
+                                <p class="small text-muted">Entropy measures how unpredictable your password is, measured in <strong>bits</strong>. It's based on:</p>
+                                <ul class="small text-muted">
+                                    <li>Password length</li>
+                                    <li>Character types used (lowercase, uppercase, numbers, symbols)</li>
+                                    <li>Randomness of the password</li>
+                                </ul>
+                                <p class="small text-muted mb-0">Each bit of entropy doubles the search space, making brute-force attacks exponentially harder.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-target"></i> Recommended Entropy Levels</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm small mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Bits</th>
+                                                <th>Strength</th>
+                                                <th>Use Case</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="table-danger-subtle">
+                                                <td>0-40</td>
+                                                <td>Very Weak</td>
+                                                <td>Not recommended</td>
+                                            </tr>
+                                            <tr class="table-warning-subtle">
+                                                <td>40-60</td>
+                                                <td>Weak</td>
+                                                <td>Low-risk accounts</td>
+                                            </tr>
+                                            <tr class="table-primary-subtle">
+                                                <td>60-80</td>
+                                                <td>Moderate</td>
+                                                <td>Most accounts</td>
+                                            </tr>
+                                            <tr class="table-success-subtle">
+                                                <td>80+</td>
+                                                <td>Strong</td>
+                                                <td>Email, banking, sensitive</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded bg-danger-subtle">
+                                    <div class="fw-bold">0-40 bits</div>
+                                    <div class="small text-muted">Very Weak</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded bg-warning-subtle">
+                                    <div class="fw-bold">40-60 bits</div>
+                                    <div class="small text-muted">Weak</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded bg-primary-subtle">
+                                    <div class="fw-bold">60-80 bits</div>
+                                    <div class="small text-muted">Moderate</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 rounded bg-success-subtle">
+                                    <div class="fw-bold">80+ bits</div>
+                                    <div class="small text-muted">Strong</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-4 text-center text-muted border-top">
+        <div class="container">
+            <small>Password Entropy Tool - For educational purposes only</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/zxcvbn.js"></script>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
