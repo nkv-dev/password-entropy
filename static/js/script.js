@@ -267,12 +267,15 @@ function updateCrackTimes(crackTimes) {
 }
 
 async function generatePassword() {
-    const targetEntropy = document.getElementById('targetEntropy').value;
+    // Get values fresh each time - don't rely on cached values
     const passwordLength = document.getElementById('passwordLength').value;
+    const targetEntropy = document.getElementById('targetEntropy').value;
     const useLowercase = document.getElementById('useLowercase').checked;
     const useUppercase = document.getElementById('useUppercase').checked;
     const useDigits = document.getElementById('useDigits').checked;
     const useSymbols = document.getElementById('useSymbols').checked;
+    
+    console.log('Generating with length:', passwordLength, 'entropy:', targetEntropy);
     
     if (!useLowercase && !useUppercase && !useDigits && !useSymbols) {
         // Show warning but don't use alert for better UX
