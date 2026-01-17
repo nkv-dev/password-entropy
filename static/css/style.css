@@ -438,6 +438,91 @@ footer {
 .strength-strong { background: #0d6efd; width: 80%; }
 .strength-very-strong { background: #198754; width: 100%; }
 
+/* Strength Preset Buttons */
+.strength-presets {
+    margin-top: 8px;
+}
+
+.strength-preset-btn {
+    padding: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.strength-preset-btn:hover {
+    border-color: #0d6efd;
+    background: var(--crack-time-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+}
+
+.strength-preset-btn.active {
+    border-color: #0d6efd;
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.strength-preset-btn.active::before {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #0d6efd;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.preset-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.preset-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.preset-strength {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--crack-time-bg);
+    color: var(--text-muted);
+}
+
+.strength-quick.active .preset-strength {
+    background: #fd7e14;
+    color: white;
+}
+
+.strength-strong.active .preset-strength {
+    background: #0d6efd;
+    color: white;
+}
+
+.strength-maximum.active .preset-strength {
+    background: #198754;
+    color: white;
+}
+
+.strength-preset-btn {
+    position: relative;
+}
+
 /* Quick Action Buttons */
 .quick-actions {
     display: flex;

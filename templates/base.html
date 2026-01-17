@@ -146,22 +146,37 @@
                             </div>
                         </div>
 
-                        <!-- Target Entropy Control -->
+                        <!-- Password Strength Presets -->
                         <div class="mb-4">
-                            <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
-                                <span>Target Entropy</span>
-                                <span class="range-value" id="entropyDisplay">60</span>
-                            </label>
-                            <input type="range" class="range-slider" id="targetEntropy" min="20" max="200" value="60">
-                            <div class="form-text d-flex justify-content-between mt-1">
-                                <span>20 bits</span>
-                                <span>200 bits</span>
-                            </div>
-                            <div class="quick-actions mt-2">
-                                <button type="button" class="quick-action-btn" onclick="setEntropy(40)">Weak (40)</button>
-                                <button type="button" class="quick-action-btn" onclick="setEntropy(60)">Fair (60)</button>
-                                <button type="button" class="quick-action-btn" onclick="setEntropy(80)">Good (80)</button>
-                                <button type="button" class="quick-action-btn" onclick="setEntropy(100)">Strong (100)</button>
+                            <label class="form-label fw-semibold">Password Strength</label>
+                            <div class="strength-presets d-grid gap-2">
+                                <button type="button" class="strength-preset-btn strength-quick" onclick="setStrengthPreset('quick')">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-start">
+                                            <div class="preset-title">🔓 Quick Password</div>
+                                            <div class="preset-desc">12 characters • Everyday accounts</div>
+                                        </div>
+                                        <div class="preset-strength">Quick</div>
+                                    </div>
+                                </button>
+                                <button type="button" class="strength-preset-btn strength-strong active" onclick="setStrengthPreset('strong')">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-start">
+                                            <div class="preset-title">🔒 Strong Password</div>
+                                            <div class="preset-desc">16 characters • Important accounts</div>
+                                        </div>
+                                        <div class="preset-strength">Strong</div>
+                                    </div>
+                                </button>
+                                <button type="button" class="strength-preset-btn strength-maximum" onclick="setStrengthPreset('maximum')">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-start">
+                                            <div class="preset-title">🔒🔒 Maximum Security</div>
+                                            <div class="preset-desc">24 characters • High-security accounts</div>
+                                        </div>
+                                        <div class="preset-strength">Maximum</div>
+                                    </div>
+                                </button>
                             </div>
                         </div>
 

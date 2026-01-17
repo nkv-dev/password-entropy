@@ -47,21 +47,8 @@ function initPasswordGenerator() {
         }
     });
     
-    // Entropy slider
-    const entropySlider = document.getElementById('targetEntropy');
-    const entropyDisplay = document.getElementById('entropyDisplay');
-    
-    if (!entropySlider || !entropyDisplay) {
-        console.error('Entropy slider elements not found!');
-        return;
-    }
-    
-    entropySlider.addEventListener('input', function(e) {
-        updateRangeValue(entropyDisplay, e.target.value);
-        if (autoGenerateEnabled) {
-            debouncedGeneratePassword();
-        }
-    });
+    // Initialize strength presets
+    initStrengthPresets();
     
     // Character type toggles
     const charTypes = ['useLowercase', 'useUppercase', 'useDigits', 'useSymbols'];
@@ -95,16 +82,68 @@ function initPasswordGenerator() {
 // Debounced password generation for sliders
 const debouncedGeneratePassword = debounce(generatePassword, 500);
 
-function setEntropy(value) {
-    const entropySlider = document.getElementById('targetEntropy');
-    const entropyDisplay = document.getElementById('entropyDisplay');
+function initStrengthPresets() {
+    // Set default preset
+    setStrengthPreset('strong');
+}
+
+function setStrengthPreset(preset) {
+    // Remove active class from all preset buttons
+    document.querySelectorAll('.strength-preset-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
     
-    entropySlider.value = value;
-    updateRangeValue(entropyDisplay, value);
+    // Add active class to selected preset button
+    const activeBtn = document.querySelector(`.strength-${preset}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
     
+    // Set length and character types based on preset
+    const lengthSlider = document.getElementById('passwordLength');
+    
+    switch(preset) {
+        case 'quick':
+            lengthSlider.value = 12;
+            updateRangeValue(document.getElementById('lengthValue'), 12);
+            // Use lowercase, uppercase, digits only
+            setCharacterTypes(true, true, true, false);
+            break;
+        case 'strong':
+            lengthSlider.value = 16;
+            updateRangeValue(document.getElementById('lengthValue'), 16);
+            // Use all character types
+            setCharacterTypes(true, true, true, true);
+            break;
+        case 'maximum':
+            lengthSlider.value = 24;
+            updateRangeValue(document.getElementById('lengthValue'), 24);
+            // Use all character types
+            setCharacterTypes(true, true, true, true);
+            break;
+    }
+    
+    // Generate password if auto-generation is enabled
     if (autoGenerateEnabled) {
         generatePassword();
     }
+}
+
+function setCharacterTypes(lowercase, uppercase, digits, symbols) {
+    const checkboxes = {
+        'useLowercase': lowercase,
+        'useUppercase': uppercase,
+        'useDigits': digits,
+        'useSymbols': symbols
+    };
+    
+    Object.keys(checkboxes).forEach(id => {
+        const checkbox = document.getElementById(id);
+        const card = checkbox.closest('.char-type-card');
+        
+        checkbox.checked = checkboxes[id];
+        card.classList.toggle('active', checkboxes[id]);
+    });
 }
 
 function selectAllChars() {
@@ -278,7 +317,6 @@ function updateCrackTimes(crackTimes) {
 async function generatePassword() {
     // Get values fresh each time - don't rely on cached values
     const passwordLength = document.getElementById('passwordLength').value;
-    const targetEntropy = document.getElementById('targetEntropy').value;
     const useLowercase = document.getElementById('useLowercase').checked;
     const useUppercase = document.getElementById('useUppercase').checked;
     const useDigits = document.getElementById('useDigits').checked;
@@ -303,9 +341,6 @@ async function generatePassword() {
     
     try {
         const passwordLength = document.getElementById('passwordLength').value;
-        const targetEntropy = document.getElementById('targetEntropy').value;
-        
-
         
         const response = await fetch('/api/generate/', {
             method: 'POST',
@@ -313,7 +348,6 @@ async function generatePassword() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                target_entropy: targetEntropy,
                 password_length: passwordLength,
                 use_lowercase: useLowercase,
                 use_uppercase: useUppercase,
@@ -410,6 +444,4 @@ async function copyPassword() {
     }
 }
 
-function setEntropy(value) {
-    document.getElementById('targetEntropy').value = value;
-}
+
