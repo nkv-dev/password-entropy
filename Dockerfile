@@ -9,9 +9,6 @@ RUN npm ci --omit=dev --silent && npm cache clean --force
 # Copy application code and set ownership
 COPY --chown=node:node . .
 
-# Create non-root user (node group already exists in base image)
-RUN adduser -D -s /bin/sh -u 1000 node
-
 USER node
 
 EXPOSE 5000
