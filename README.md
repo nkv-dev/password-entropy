@@ -34,3 +34,4 @@ A web-based password strength analyzer and generator that calculates password en
 
 - `POST /api/analyze/` - Analyze password strength
 - `POST /api/generate/` - Generate secure password
+# password-entropy
