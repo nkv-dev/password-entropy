@@ -1,0 +1,423 @@
+/* =====================================================
+   RESPONSIVE - Mobile-First Approach with Safe Areas
+   ===================================================== */
+
+/* Notched phones safe area support */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .main-panel {
+    padding-top: max(32px, env(safe-area-inset-top) + 16px);
+    padding-bottom: max(32px, env(safe-area-inset-bottom) + 16px);
+    padding-left: max(32px, env(safe-area-inset-left) + 16px);
+    padding-right: max(32px, env(safe-area-inset-right) + 16px);
+  }
+}
+
+/* Touch targets minimum 44x44px (WCAG compliance) */
+.btn-toggle-password,
+.entropy-btn,
+.btn-close-panel,
+.preset-chip,
+.check-box,
+.btn-icon,
+.section-toggle,
+.quick-action-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Tablet breakpoint (768px - 991px) */
+@media (max-width: 991px) {
+  .main-panel {
+    max-width: 600px;
+    padding: 28px;
+  }
+  
+  .crack-times-compact {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .entropy-scale {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Mobile landscape (576px - 767px) */
+@media (max-width: 767px) {
+  .main-panel {
+    max-width: 100%;
+    padding: 24px;
+    margin: 12px;
+  }
+  
+  .entropy-title h1 {
+    font-size: 1.75rem;
+  }
+  
+  .action-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .entropy-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+  
+  .password-input {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    padding: 16px 50px 16px 16px !important;
+  }
+  
+  /* Reduce glass blur for performance */
+  .main-panel {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  /* Larger touch targets */
+  .preset-chip {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .char-check {
+    flex: 1 1 calc(50% - 4px);
+    min-width: unset;
+  }
+  
+  .check-box {
+    padding: 12px 8px;
+    font-size: 0.9rem;
+  }
+  
+  /* Stack preset chips vertically on smaller tablets */
+  .preset-chips {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .preset-chip {
+    flex: 1 1 calc(33% - 6px);
+  }
+}
+
+/* Small mobile (up to 575px) */
+@media (max-width: 575px) {
+  .ui-layer {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+  
+  .main-panel {
+    padding: 20px 16px;
+    margin: 0;
+    border-radius: 16px;
+    width: 100%;
+  }
+  
+  .entropy-title {
+    margin-bottom: 20px;
+  }
+  
+  .entropy-title h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .entropy-title p {
+    font-size: 0.9rem;
+  }
+  
+  /* Full-width action buttons */
+  .action-row {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .entropy-btn {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+  
+  /* Password input optimizations */
+  .password-input {
+    font-size: 16px !important; /* Critical: prevents iOS zoom */
+    padding: 16px 50px 16px 14px !important;
+    letter-spacing: 0.5px;
+  }
+  
+  .btn-toggle-password {
+    padding: 12px;
+    right: 8px;
+  }
+  
+  /* Generator panel optimizations */
+  .panel-section {
+    padding: 14px;
+    margin-top: 10px;
+  }
+  
+  .panel-header {
+    margin-bottom: 14px;
+  }
+  
+  .panel-header h6 {
+    font-size: 0.95rem;
+  }
+  
+  /* Range slider larger for touch */
+  .range-slider {
+    height: 8px;
+  }
+  
+  .range-slider::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .range-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Preset chips vertical stack */
+  .preset-chips {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .preset-chip {
+    width: 100%;
+    padding: 14px 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Character types 2x2 grid */
+  .char-types-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .char-check {
+    width: 100%;
+  }
+  
+  .check-box {
+    padding: 14px 8px;
+    font-size: 0.9rem;
+  }
+  
+  /* Generated display */
+  .generated-display {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+  
+  .password-result {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  .password-actions {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .btn-icon {
+    padding: 10px;
+    font-size: 1.1rem;
+  }
+  
+  /* Analysis panel */
+  .score-row {
+    gap: 24px;
+  }
+  
+  .score-circle-sm {
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
+  }
+  
+  .entropy-number {
+    font-size: 1.75rem;
+  }
+  
+  /* Crack times stack vertically */
+  .crack-times-compact {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .crack-item {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+  
+  /* Security verdict full width */
+  .security-verdict {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
+  
+  /* Feedback area */
+  .feedback-area .alert-sm {
+    padding: 14px;
+  }
+  
+  /* Collapsible sections */
+  .section-toggle {
+    padding: 14px 0;
+    font-size: 0.95rem;
+  }
+  
+  .section-content {
+    padding: 0 0 16px 16px;
+  }
+  
+  /* Advanced options */
+  .advanced-options {
+    flex-direction: column;
+  }
+  
+  .quick-action-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Entropy scale vertical */
+  .entropy-scale {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .scale-item {
+    padding: 10px 12px;
+  }
+  
+  /* Quick stats larger */
+  .quick-stats {
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+  }
+  
+  /* Reduce glass blur further for small screens */
+  .main-panel {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Extra small devices (up to 375px) */
+@media (max-width: 375px) {
+  .main-panel {
+    padding: 16px 12px;
+  }
+  
+  .entropy-title h1 {
+    font-size: 1.35rem;
+  }
+  
+  .password-input {
+    font-size: 15px !important;
+  }
+  
+  .entropy-btn {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+  }
+  
+  .panel-section {
+    padding: 12px;
+  }
+  
+  .check-box {
+    padding: 12px 6px;
+    font-size: 0.85rem;
+  }
+  
+  .crack-item {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+  
+  .score-circle-sm {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+  
+  .entropy-number {
+    font-size: 1.5rem;
+  }
+}
+
+/* =====================================================
+   MOBILE UTILITIES & ANIMATIONS
+   ===================================================== */
+
+/* Mobile toast styling */
+.mobile-toast {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-weight: 500;
+}
+
+/* Touch feedback for buttons */
+.entropy-btn:active,
+.preset-chip:active,
+.check-box:active,
+.btn-icon:active,
+.quick-action-btn:active {
+  transform: scale(0.98);
+  transition: transform 0.1s;
+}
+
+/* Smooth scrolling for mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Disable text selection on interactive elements for better mobile UX */
+.entropy-btn,
+.preset-chip,
+.check-box,
+.btn-icon,
+.btn-toggle-password,
+.btn-close-panel,
+.section-toggle,
+.quick-action-btn {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Mobile input zoom prevention */
+@media screen and (max-width: 575px) {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

@@ -1,0 +1,179 @@
+/* =====================================================
+   GENERATOR PANEL - Range Slider, Chips, Char Types
+   ===================================================== */
+
+/* Range Slider */
+.range-value-sm {
+  background: var(--accent);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.range-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 2px 6px var(--accent-glow);
+}
+
+.range-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px var(--accent-glow);
+}
+
+/* Preset Chips */
+.preset-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-chip {
+  flex: 1;
+  min-width: 100px;
+  padding: 8px 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.preset-chip:hover {
+  background: rgba(124, 124, 255, 0.1);
+  border-color: var(--accent);
+}
+
+.preset-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* Character Types */
+.char-types-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.char-check {
+  flex: 1;
+  min-width: 70px;
+  cursor: pointer;
+}
+
+.char-check input {
+  display: none;
+}
+
+.check-box {
+  display: block;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  transition: all 0.2s;
+}
+
+.char-check input:checked + .check-box {
+  background: rgba(124, 124, 255, 0.2);
+  border-color: var(--accent);
+  color: var(--text-main);
+}
+
+/* Generated Display */
+.generated-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(124, 124, 255, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.password-result {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  word-break: break-all;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+/* Character type colors for password highlighting */
+.char-num {
+  color: #ffc107; /* Amber - numbers */
+  font-weight: 600;
+}
+
+.char-alpha {
+  color: #7c7cff; /* Blue/Purple - letters */
+}
+
+.char-bracket {
+  color: #4ade80; /* Green - brackets */
+  font-weight: 600;
+}
+
+.char-symbol {
+  color: #ff6b9d; /* Pink/Magenta - symbols */
+  font-weight: 600;
+}
+
+/* Hover effect on password characters */
+.password-result span:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  cursor: default;
+}
+
+.password-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.2s;
+}
+
+.btn-icon:hover {
+  color: var(--accent);
+}

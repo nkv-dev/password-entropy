@@ -1,0 +1,94 @@
+/* =====================================================
+   BASE STYLES - CSS Variables, Reset, Canvas, Layout
+   ===================================================== */
+
+:root {
+  --bg-main: #05070c;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --accent: #7c7cff;
+  --accent-soft: rgba(124, 124, 255, 0.25);
+  --accent-glow: rgba(124, 124, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-main);
+  color: var(--text-main);
+  overflow-x: hidden;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* =====================================================
+   CHAOS CANVAS (BACKGROUND)
+   ===================================================== */
+
+#chaos-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* =====================================================
+   UI LAYER & MAIN PANEL
+   ===================================================== */
+
+.ui-layer {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.main-panel {
+  pointer-events: auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 32px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.entropy-title {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.entropy-title h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--text-main) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.entropy-title p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}

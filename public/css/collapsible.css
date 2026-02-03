@@ -1,0 +1,106 @@
+/* =====================================================
+   COLLAPSIBLE SECTIONS & UNDERSTANDING
+   ===================================================== */
+
+.collapsible-section {
+  border-top: 1px solid var(--glass-border);
+  margin-top: 8px;
+}
+
+.section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.section-toggle:hover {
+  color: var(--text-main);
+}
+
+.section-content {
+  padding: 0 0 16px 24px;
+  animation: slideDown 0.3s ease;
+}
+
+/* Advanced Options */
+.advanced-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-action-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quick-action-btn:hover {
+  background: rgba(124, 124, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--text-main);
+}
+
+/* Understanding Content */
+.understanding-content {
+  padding-left: 8px;
+}
+
+.entropy-scale {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.scale-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.scale-item.weak { background: rgba(220, 53, 69, 0.15); color: #ff6b7a; }
+.scale-item.moderate { background: rgba(255, 193, 7, 0.15); color: #ffd166; }
+.scale-item.strong { background: rgba(124, 124, 255, 0.15); color: var(--accent); }
+.scale-item.very-strong { background: rgba(25, 135, 84, 0.15); color: #4ade80; }
+
+.scale-range {
+  font-weight: 600;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.social-links a {
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  transition: color 0.2s;
+}
+
+.social-links a:hover {
+  color: var(--accent);
+}

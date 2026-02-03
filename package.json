@@ -2,14 +2,14 @@
   "name": "password-entropy-tool",
   "version": "1.0.0",
   "description": "Password Entropy Analyzer and Generator",
-  "main": "server.js",
+  "main": "src/server.js",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
     "build": "echo 'No build step required for Node.js'"
   },
   "dependencies": {

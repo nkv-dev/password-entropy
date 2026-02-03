@@ -1,0 +1,168 @@
+/* =====================================================
+   COMPONENTS - Buttons, Inputs, Toggles, Stats
+   ===================================================== */
+
+/* =====================================================
+   PASSWORD INPUT
+   ===================================================== */
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px !important;
+  color: var(--text-main) !important;
+  font-size: 1.1rem;
+  padding: 14px 50px 14px 16px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 1px;
+  outline: none;
+}
+
+.password-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+}
+
+.password-input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s;
+}
+
+.btn-toggle-password:hover {
+  color: var(--accent);
+}
+
+/* =====================================================
+   QUICK STATS
+   ===================================================== */
+
+.quick-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.quick-stats .separator {
+  color: var(--glass-border);
+}
+
+.quick-stats #quickStrength {
+  font-weight: 600;
+}
+
+/* =====================================================
+   ACTION BUTTONS
+   ===================================================== */
+
+.action-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.entropy-btn {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.entropy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(124, 124, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.entropy-btn.primary {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(124,124,255,0.25), rgba(124,124,255,0.08));
+}
+
+.entropy-btn.primary:hover {
+  background: linear-gradient(135deg, rgba(124,124,255,0.35), rgba(124,124,255,0.15));
+  box-shadow: 0 10px 30px var(--accent-glow);
+}
+
+/* =====================================================
+   TOGGLE PANELS
+   ===================================================== */
+
+.toggle-panels {
+  margin-bottom: 16px;
+}
+
+.panel-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.panel-header h6 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.btn-close-panel {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.btn-close-panel:hover {
+  color: var(--text-main);
+}

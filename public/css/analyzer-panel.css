@@ -1,0 +1,119 @@
+/* =====================================================
+   ANALYZER PANEL - Score, Entropy, Crack Times
+   ===================================================== */
+
+/* Score & Entropy */
+.score-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+
+.score-box, .entropy-box {
+  text-align: center;
+}
+
+.score-circle-sm {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0 auto 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.score-circle-sm.score-0 { background: #dc3545; color: white; }
+.score-circle-sm.score-1 { background: #fd7e14; color: white; }
+.score-circle-sm.score-2 { background: #ffc107; color: black; }
+.score-circle-sm.score-3 { background: var(--accent); color: white; box-shadow: 0 0 15px var(--accent-glow); }
+.score-circle-sm.score-4 { background: #198754; color: white; }
+
+.entropy-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 15px var(--accent-glow);
+}
+
+/* Progress Bar */
+.progress {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  transition: width 0.5s ease;
+}
+
+/* Crack Times Compact */
+.crack-times-compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.crack-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.crack-label {
+  color: var(--text-muted);
+}
+
+.crack-value {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+/* Security Verdict */
+.security-verdict {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+.security-verdict i {
+  font-size: 1.25rem;
+}
+
+/* Feedback */
+.feedback-area {
+  margin-top: 12px;
+}
+
+.alert-sm {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.15);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #ff6b7a;
+}
+
+.alert-warning {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #ffd166;
+}
