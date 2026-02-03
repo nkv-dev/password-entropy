@@ -388,6 +388,8 @@ footer {
     background: #e9ecef;
     outline: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     transition: background 0.3s;
 }
 
