@@ -3,6 +3,30 @@ let currentPassword = '';
 let lastGeneratedPassword = '';
 let autoGenerateEnabled = false;
 
+// Password syntax highlighting
+function highlightPassword(password) {
+    if (!password) return '';
+    
+    let html = '';
+    for (let char of password) {
+        let className = '';
+        
+        if (/[0-9]/.test(char)) {
+            className = 'char-num';
+        } else if (/[a-zA-Z]/.test(char)) {
+            className = 'char-alpha';
+        } else if (/[()\[\]{}<>]/.test(char)) {
+            className = 'char-bracket';
+        } else {
+            className = 'char-symbol';
+        }
+        
+        html += `<span class="${className}">${char}</span>`;
+    }
+    
+    return html;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initPasswordGenerator();
     initAnalysis();
@@ -342,7 +366,7 @@ async function generatePassword() {
         
         if (generatedDisplay && generatedPassword) {
             generatedDisplay.style.display = 'flex';
-            generatedPassword.textContent = data.password;
+            generatedPassword.innerHTML = highlightPassword(data.password);
         }
         
     } catch (error) {
