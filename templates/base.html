@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#05070c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Password Entropy">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="/static/images/icon-192.png">
     <title>Password Entropy – Chaos Mode</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
@@ -260,24 +267,52 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/script.js"></script>
     <script>
-        // Chaos Bubble Animation
+        // Chaos Bubble Animation - Mobile Optimized
         const canvas = document.getElementById('chaos-canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: true }); // Enable transparency optimization
+        
+        // Device detection for performance tuning
+        const isMobile = window.matchMedia('(pointer: coarse)').matches;
+        const isSmallScreen = window.innerWidth <= 575;
+        
+        // Adjust bubble count based on device capabilities
+        const bubbleCount = isSmallScreen ? 12 : (isMobile ? 18 : 25);
+        const connectionDistance = isSmallScreen ? 100 : 150;
+        const connectionOpacity = isSmallScreen ? 0.05 : 0.1;
+        
+        let animationId = null;
+        let isVisible = true;
+        let frameCount = 0;
         
         function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(dpr, dpr);
         }
         
-        window.addEventListener('resize', resize);
+        window.addEventListener('resize', () => {
+            resize();
+            // Reinitialize bubbles on resize to prevent out-of-bounds
+            bubbles.forEach(bubble => bubble.reset());
+        });
         resize();
+        
+        // Visibility check - pause animation when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            isVisible = !document.hidden;
+            if (isVisible && !animationId) {
+                animate();
+            }
+        });
         
         // Bubble system
         const bubbles = [];
-        const bubbleCount = 25;
         
         class Bubble {
             constructor() {
@@ -285,19 +320,24 @@
             }
             
             reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
+                this.x = Math.random() * (canvas.width / (window.devicePixelRatio || 1));
+                this.y = Math.random() * (canvas.height / (window.devicePixelRatio || 1));
                 this.size = Math.random() * 4 + 2;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5;
+                // Slower movement on mobile for better performance
+                const speedMultiplier = isMobile ? 0.3 : 0.5;
+                this.speedX = (Math.random() - 0.5) * speedMultiplier;
+                this.speedY = (Math.random() - 0.5) * speedMultiplier;
                 this.opacity = Math.random() * 0.5 + 0.1;
             }
             
             update() {
+                const width = canvas.width / (window.devicePixelRatio || 1);
+                const height = canvas.height / (window.devicePixelRatio || 1);
+                
                 this.x += this.speedX;
                 this.y += this.speedY;
                 
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
                     this.reset();
                 }
             }
@@ -315,34 +355,47 @@
             bubbles.push(new Bubble());
         }
         
-        // Animation loop
+        // Animation loop with frame skipping on mobile for battery saving
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!isVisible) {
+                animationId = null;
+                return;
+            }
             
-            // Draw bubbles
-            bubbles.forEach(bubble => {
-                bubble.update();
-                bubble.draw();
-            });
+            frameCount++;
+            // Skip frames on mobile (30fps instead of 60fps)
+            const skipFrames = isMobile ? 1 : 0;
             
-            // Draw connections
-            bubbles.forEach((bubble, i) => {
-                bubbles.slice(i + 1).forEach(other => {
-                    const dx = bubble.x - other.x;
-                    const dy = bubble.y - other.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 150) {
-                        ctx.beginPath();
-                        ctx.moveTo(bubble.x, bubble.y);
-                        ctx.lineTo(other.x, other.y);
-                        ctx.strokeStyle = `rgba(124, 124, 255, ${0.1 * (1 - distance / 150)})`;
-                        ctx.stroke();
-                    }
+            if (frameCount % (skipFrames + 1) === 0) {
+                ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+                
+                // Draw bubbles
+                bubbles.forEach(bubble => {
+                    bubble.update();
+                    bubble.draw();
                 });
-            });
+                
+                // Draw connections - skip on very small screens for performance
+                if (!isSmallScreen) {
+                    bubbles.forEach((bubble, i) => {
+                        bubbles.slice(i + 1).forEach(other => {
+                            const dx = bubble.x - other.x;
+                            const dy = bubble.y - other.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance < connectionDistance) {
+                                ctx.beginPath();
+                                ctx.moveTo(bubble.x, bubble.y);
+                                ctx.lineTo(other.x, other.y);
+                                ctx.strokeStyle = `rgba(124, 124, 255, ${connectionOpacity * (1 - distance / connectionDistance)})`;
+                                ctx.stroke();
+                            }
+                        });
+                    });
+                }
+            }
             
-            requestAnimationFrame(animate);
+            animationId = requestAnimationFrame(animate);
         }
         
         animate();

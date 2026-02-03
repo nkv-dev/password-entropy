@@ -417,8 +417,13 @@ async function checkEntropy() {
 // Show notification
 function showNotification(message, type = 'info') {
     const toast = document.createElement('div');
-    toast.className = `alert alert-${type} position-fixed`;
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px; border-radius: 8px;';
+    toast.className = `alert alert-${type} position-fixed mobile-toast`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px; max-width: calc(100vw - 40px); border-radius: 8px; font-size: 0.95rem; padding: 14px 18px;';
+    
+    // Check if mobile and adjust position
+    if (window.innerWidth <= 575) {
+        toast.style.cssText = 'top: 16px; left: 16px; right: 16px; z-index: 9999; border-radius: 12px; font-size: 0.95rem; padding: 16px 20px; text-align: center;';
+    }
     
     const icons = {
         'success': 'check-circle',
@@ -428,18 +433,36 @@ function showNotification(message, type = 'info') {
     };
     
     toast.innerHTML = `
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-center">
             <i class="bi bi-${icons[type]} me-2"></i>
-            ${message}
+            <span>${message}</span>
         </div>
     `;
     
     document.body.appendChild(toast);
     
+    // Handle resize to update position
+    const handleResize = () => {
+        if (window.innerWidth <= 575) {
+            toast.style.left = '16px';
+            toast.style.right = '16px';
+            toast.style.top = '16px';
+        } else {
+            toast.style.left = '';
+            toast.style.right = '20px';
+            toast.style.top = '20px';
+        }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.3s';
-        setTimeout(() => toast.remove(), 300);
+        setTimeout(() => {
+            toast.remove();
+            window.removeEventListener('resize', handleResize);
+        }, 300);
     }, 3000);
 }
 
