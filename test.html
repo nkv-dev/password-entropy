@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Entropy – Chaos Mode</title>
+
+  <!-- Minimal Bootstrap (layout only) -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+  /* =====================================================
+     CHAOS BUBBLE – NKV-DEV THEME
+     Standalone page: /entropy
+     ===================================================== */
+
+  :root {
+    --bg-main: #05070c;
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --text-main: #e5e7eb;
+    --text-muted: #9ca3af;
+    --accent: #7c7cff; /* keep in sync with nkv-dev.in */
+    --accent-soft: rgba(124, 124, 255, 0.25);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg-main);
+    color: var(--text-main);
+    overflow: hidden; /* chaos canvas owns the screen */
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont;
+  }
+
+  /* =====================================================
+     CHAOS CANVAS (BACKGROUND)
+     ===================================================== */
+
+  #chaos-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  /* =====================================================
+     GLASS UI LAYER
+     ===================================================== */
+
+  .ui-layer {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* allow bubbles to feel alive */
+  }
+
+  .glass-panel {
+    pointer-events: auto;
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 32px;
+    width: min(92vw, 520px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+
+  /* =====================================================
+     HEADER
+     ===================================================== */
+
+  .entropy-title {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .entropy-title h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .entropy-title p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* =====================================================
+     PASSWORD INPUT
+     ===================================================== */
+
+  .password-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 1px;
+  }
+
+  .password-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  /* =====================================================
+     ENTROPY FEEDBACK (MINIMAL – MOTION FIRST)
+     ===================================================== */
+
+  .entropy-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .entropy-meta strong {
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  /* =====================================================
+     GENERATOR ACTION
+     ===================================================== */
+
+  .action-row {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .entropy-btn {
+    flex: 1;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .entropy-btn.primary {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(124,124,255,0.25), rgba(124,124,255,0.08));
+  }
+
+  .entropy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+
+  /* =====================================================
+     FOOTER HINT
+     ===================================================== */
+
+  .entropy-hint {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  </style>
+
+</head>
+<body>
+
+  <!-- CHAOS BUBBLE ENGINE CANVAS -->
+
+<canvas id="chaos-canvas"></canvas>
+
+  <!-- UI LAYER -->
+
+  <div class="ui-layer">
+    <div class="glass-panel">
+
+```
+  <div class="entropy-title">
+    <h1>Password Entropy</h1>
+    <p>Chaos-driven security analysis</p>
+  </div>
+
+  <input
+    type="password"
+    class="password-input"
+    placeholder="Type password…"
+    id="passwordInput"
+    autocomplete="off"
+  />
+
+  <div class="entropy-meta">
+    <div>Entropy: <strong id="entropyBits">–</strong></div>
+    <div>Strength: <strong id="entropyLabel">–</strong></div>
+  </div>
+
+  <div class="action-row">
+    <button class="entropy-btn">Generate</button>
+    <button class="entropy-btn primary">Analyze</button>
+  </div>
+
+  <div class="entropy-hint">
+    Bubble motion reacts to entropy & randomness
+  </div>
+
+</div>
+```
+
+  </div>
+
+  <!-- =====================================================
+       CHAOS ENGINE PLACEHOLDER (YOU WILL REPLACE)
+       ===================================================== -->
+
+  <script>
+    // NOTE:
+    // Replace this entire block with your existing Chaos Bubble Engine
+    // from nkv-dev.in. Hooks you may want:
+    // - setChaosEnergy(value)
+    // - setBubbleDensity(value)
+    // - setChaosAccent(color)
+
+    const canvas = document.getElementById('chaos-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Temporary ambient background animation
+    let t = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(124,124,255,0.06)';
+      ctx.beginPath();
+      ctx.arc(
+        canvas.width / 2 + Math.sin(t) * 120,
+        canvas.height / 2 + Math.cos(t * 1.3) * 80,
+        180,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      t += 0.005;
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+
+</body>
+</html>
