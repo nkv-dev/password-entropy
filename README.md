@@ -112,6 +112,29 @@ The project follows a modular architecture for maintainability:
 npm run dev
 ```
 
+## Environment Variables
+
+Create a `.env` file in the root directory (optional):
+
+```env
+# Server Configuration
+PORT=5000                          # Server port (default: 5000)
+NODE_ENV=development               # Environment mode (development/production)
+
+# CORS Settings
+CORS_ORIGIN=*                      # Allowed CORS origins
+```
+
+### Variable Descriptions
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | 5000 | The port number the server listens on |
+| `NODE_ENV` | development | Sets application environment mode |
+| `CORS_ORIGIN` | * | Configures CORS origin policy |
+
+**Note:** The application works without a `.env` file using sensible defaults.
+
 ## Docker Deployment
 
 Build and run with Docker:
@@ -257,6 +280,107 @@ Entropy (bits) = Password Length × log2(Character Pool Size)
 - Mobile Safari (iOS 14+)
 - Chrome Mobile (Android 10+)
 
+## Security Considerations
+
+### Password Security
+
+- **No Password Storage**: Passwords are never stored or logged server-side
+- **Client-Side Analysis**: Entropy calculation can be done without sending passwords to the server (for offline analysis)
+- **HTTPS Recommended**: Always use HTTPS in production to protect password transmission
+- **Clipboard**: Generated passwords are copied to system clipboard - clear clipboard after use on shared computers
+
+### Cryptographic Security
+
+- **Random Generation**: Uses Node.js `crypto.randomInt()` for cryptographically secure random number generation
+- **Character Pool**: 94 possible characters (26 lowercase + 26 uppercase + 10 digits + 32 symbols)
+- **Minimum Length**: Enforces minimum 5 character length for generated passwords
+- **Maximum Length**: Limited to 128 characters to prevent abuse
+
+### API Security
+
+- **CORS**: Configurable CORS origins (restrict in production)
+- **Rate Limiting**: Not included - add rate limiting middleware for production use
+- **Input Validation**: Passwords limited to reasonable length via API
+- **No SQL/NoSQL**: No database - no SQL injection risk
+
+## Troubleshooting
+
+### Common Issues
+
+#### Port Already in Use
+
+**Error:** `Error: listen EADDRINUSE: address already in use :::5000`
+
+**Solution:**
+```bash
+# Kill process using port 5000
+lsof -ti:5000 | xargs kill -9
+
+# Or use a different port
+PORT=3000 npm start
+```
+
+#### Canvas Animation Not Working
+
+**Issue:** Chaos bubble background not animating
+
+**Solutions:**
+1. Check if JavaScript is enabled in browser
+2. Verify no browser extensions blocking canvas (privacy blockers)
+3. Mobile devices: Check "Low Power Mode" isn't enabled (disables animations)
+
+#### CSS Not Loading
+
+**Issue:** Page appears unstyled
+
+**Solutions:**
+1. Check browser console for 404 errors
+2. Verify `public/` directory exists with CSS files
+3. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)
+4. Check that `express.static` is serving files correctly
+
+#### API Endpoints Not Responding
+
+**Issue:** "Error analyzing password" messages
+
+**Solutions:**
+1. Check server is running: `curl http://localhost:5000/health`
+2. Verify no CORS errors in browser console
+3. Check server logs for errors
+4. Ensure `NODE_ENV` is not set incorrectly
+
+### Docker Issues
+
+#### Container Won't Start
+
+```bash
+# Check Docker logs
+docker logs <container-id>
+
+# Rebuild with no cache
+docker build --no-cache -t password-entropy .
+```
+
+#### Health Check Failing
+
+The health check uses Node.js to ping the `/health` endpoint. If it fails:
+1. Ensure the server is actually listening on port 5000 inside the container
+2. Check the container can reach itself via localhost
+
+## Performance Tips
+
+### For Mobile Devices
+
+- **Disable Canvas**: On very low-end devices, the animation can be disabled by adding `?noanim=true` to the URL (if implemented)
+- **Reduce Bubbles**: The animation automatically reduces bubble count on mobile (12 vs 25)
+- **Frame Skipping**: Mobile devices get 30fps instead of 60fps to save battery
+
+### For Production
+
+- **CDN**: Serve static assets from a CDN in production
+- **Compression**: Enable gzip/brotli compression (Express does this automatically with proper middleware)
+- **Caching**: Static assets are cached for 1 year in production mode (`maxAge: '1y'`)
+
 ## Technologies
 
 - **Backend**: Node.js 18+, Express.js 4.18.2
@@ -266,9 +390,84 @@ Entropy (bits) = Password Length × log2(Character Pool Size)
 - **Crypto**: Node.js built-in `crypto` module for secure random generation
 - **Container**: Docker with Node.js 18 Alpine image
 
+## Development
+
+### Project Scripts
+
+```bash
+# Start production server
+npm start
+
+# Development mode (same as start)
+npm run dev
+
+# Build (no-op for this project)
+npm run build
+```
+
+### Code Style
+
+- **Backend**: CommonJS modules (`require`/`module.exports`)
+- **Frontend**: ES6+ features, vanilla JavaScript (no frameworks)
+- **CSS**: Modular CSS with BEM-like naming conventions
+- **Indentation**: 4 spaces for JavaScript, 2 spaces for CSS
+
+### Adding New Features
+
+1. **New API Endpoint**: Add route file in `src/routes/`, import in `src/server.js`
+2. **New CSS**: Create module in `public/css/`, link in `views/index.html`
+3. **New JavaScript**: Create module in `public/js/`, load after dependencies in HTML
+4. **Mobile Support**: Test all changes at 375px, 575px, 767px, and 991px breakpoints
+
+### Testing Checklist
+
+Before submitting changes:
+- [ ] Works on desktop (Chrome, Firefox, Safari)
+- [ ] Works on mobile (iOS Safari, Chrome Mobile)
+- [ ] Canvas animation performs well on mobile
+- [ ] All buttons have 44×44px touch targets
+- [ ] No horizontal scroll on mobile
+- [ ] API endpoints return correct responses
+- [ ] No console errors
+- [ ] Password generation works with all character type combinations
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **Commit** your changes: `git commit -m 'Add amazing feature'`
+4. **Push** to the branch: `git push origin feature/amazing-feature`
+5. **Open** a Pull Request
+
+### Contribution Ideas
+
+- Add password history/local storage
+- Add dark/light theme toggle
+- Add password sharing (secure link generation)
+- Add unit tests
+- Add i18n (internationalization) support
+- Add accessibility improvements (ARIA labels, screen reader support)
+- Optimize canvas animation further
+- Add password breach checking (Have I Been Pwned API integration)
+
+## Acknowledgments
+
+- **Bootstrap**: UI framework and icons by [Bootstrap](https://getbootstrap.com/)
+- **zxcvbn**: Password strength estimation library by Dropbox
+- **Canvas Animation**: Chaos bubble animation inspired by particle network concepts
+- **Entropy Calculation**: Based on standard information entropy formulas (Shannon entropy)
+
 ## License
 
-MIT License - See LICENSE file for details
+MIT License - See [LICENSE](LICENSE) file for details
+
+---
+
+**Made with ❤️ by [nkv-dev](https://github.com/nkv-dev)**
+
+If you found this project helpful, please ⭐ star the repository!
 
 ## Author
 
