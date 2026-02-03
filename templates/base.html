@@ -1,503 +1,481 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Entropy Tool</title>
+    <title>Password Entropy – Chaos Mode</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
-<body class="bg-body">
-    <nav class="navbar navbar-expand-lg navbar-theme">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-shield-lock"></i> Password Entropy Tool
-            </a>
-            <button class="btn btn-outline-theme" id="themeToggle" onclick="toggleTheme()">
-                <i class="bi bi-moon-fill" id="themeIcon"></i>
-            </button>
-        </div>
-    </nav>
+<body>
+    <!-- CHAOS BUBBLE ENGINE CANVAS -->
+    <canvas id="chaos-canvas"></canvas>
 
-    <main class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bold mb-3">Password Entropy Analyzer</h1>
-                    <p class="lead text-muted">Check your password strength and generate secure passwords</p>
-                </div>
+    <!-- UI LAYER -->
+    <div class="ui-layer">
+        <div class="main-panel">
+            <!-- Header -->
+            <div class="entropy-title">
+                <h1>Password Entropy</h1>
+                <p>Chaos-driven security analysis</p>
+            </div>
 
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <label for="passwordInput" class="form-label fw-semibold">Enter Password</label>
-                        <div class="input-group input-group-lg mb-3">
-                            <input type="password" class="form-control" id="passwordInput" placeholder="Type your password..." autocomplete="off">
-                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                <i class="bi bi-eye" id="passwordEye"></i>
+            <!-- Password Input -->
+            <div class="input-wrapper mb-3">
+                <input 
+                    type="password" 
+                    class="password-input form-control" 
+                    id="passwordInput" 
+                    placeholder="Type password..." 
+                    autocomplete="off"
+                />
+                <button class="btn-toggle-password" id="togglePassword" type="button">
+                    <i class="bi bi-eye" id="passwordEye"></i>
+                </button>
+            </div>
+
+            <!-- Quick Stats (always visible) -->
+            <div class="quick-stats" id="quickStats" style="display: none;">
+                <span id="quickEntropy">-- bits</span>
+                <span class="separator">|</span>
+                <span id="quickStrength">--</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-row">
+                <button class="entropy-btn" id="generateBtn" onclick="showGeneratePanel()">
+                    <i class="bi bi-stars"></i> Generate
+                </button>
+                <button class="entropy-btn primary" id="analyzeBtn" onclick="showAnalyzePanel()">
+                    <i class="bi bi-shield-check"></i> Analyze
+                </button>
+            </div>
+
+            <!-- Toggle Panels Container -->
+            <div class="toggle-panels">
+                <!-- Generate Panel -->
+                <div class="panel-section" id="generatePanel" style="display: none;">
+                    <div class="panel-header">
+                        <h6><i class="bi bi-key"></i> Password Generator</h6>
+                        <button class="btn-close-panel" onclick="closePanel()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Length Control -->
+                    <div class="mb-3">
+                        <label class="d-flex justify-content-between mb-2">
+                            <span>Length</span>
+                            <span class="range-value-sm" id="lengthValue">16</span>
+                        </label>
+                        <input type="range" class="range-slider" id="passwordLength" min="5" max="128" value="16">
+                    </div>
+
+                    <!-- Strength Presets -->
+                    <div class="preset-chips mb-3">
+                        <button class="preset-chip" data-preset="quick" onclick="setStrengthPreset('quick')">
+                            <i class="bi bi-lightning"></i> Quick (12)
+                        </button>
+                        <button class="preset-chip active" data-preset="strong" onclick="setStrengthPreset('strong')">
+                            <i class="bi bi-shield"></i> Strong (16)
+                        </button>
+                        <button class="preset-chip" data-preset="maximum" onclick="setStrengthPreset('maximum')">
+                            <i class="bi bi-shield-fill"></i> Maximum (24)
+                        </button>
+                    </div>
+
+                    <!-- Character Types -->
+                    <div class="char-types-row mb-3">
+                        <label class="char-check">
+                            <input type="checkbox" id="useLowercase" checked>
+                            <span class="check-box">a-z</span>
+                        </label>
+                        <label class="char-check">
+                            <input type="checkbox" id="useUppercase" checked>
+                            <span class="check-box">A-Z</span>
+                        </label>
+                        <label class="char-check">
+                            <input type="checkbox" id="useDigits" checked>
+                            <span class="check-box">0-9</span>
+                        </label>
+                        <label class="char-check">
+                            <input type="checkbox" id="useSymbols" checked>
+                            <span class="check-box">!@#</span>
+                        </label>
+                    </div>
+
+                    <!-- Generated Password Display -->
+                    <div class="generated-display" id="generatedDisplay" style="display: none;">
+                        <div class="password-result" id="generatedPassword"></div>
+                        <div class="password-actions">
+                            <button class="btn-icon" onclick="copyPassword()" title="Copy">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                            <button class="btn-icon" onclick="regeneratePassword()" title="Regenerate">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn-icon" onclick="checkEntropy()" title="Check Entropy">
+                                <i class="bi bi-shield-check"></i>
                             </button>
                         </div>
-
-                        <div id="resultsSection" class="d-none">
-                            <div class="row mb-4">
-                                <div class="col-md-4">
-                                    <div class="score-display text-center">
-                                        <div class="score-circle mb-2" id="scoreCircle">0</div>
-                                        <div class="small text-muted">Strength Score</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="stat-display text-center">
-                                        <div class="stat-value" id="entropyValue">0</div>
-                                        <div class="small text-muted">Bits of Entropy</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="stat-display text-center">
-                                        <div class="stat-value" id="analyzedLengthValue">0</div>
-                                        <div class="small text-muted">Characters</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="progress mb-3" style="height: 10px;">
-                                <div class="progress-bar" id="strengthBar" role="progressbar" style="width: 0%"></div>
-                            </div>
-
-                            <div class="alert" id="feedbackAlert" style="display: none;">
-                                <div class="d-flex align-items-start">
-                                    <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
-                                    <div>
-                                        <div id="feedbackWarning" class="fw-semibold"></div>
-                                        <ul id="feedbackSuggestions" class="mb-0 small"></ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
+
+                    <button class="entropy-btn primary w-100" onclick="generatePassword()">
+                        <i class="bi bi-magic"></i> Create Password
+                    </button>
                 </div>
 
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> Security Analysis</h5>
+                <!-- Analyze Panel -->
+                <div class="panel-section" id="analyzePanel" style="display: none;">
+                    <div class="panel-header">
+                        <h6><i class="bi bi-graph-up"></i> Analysis Results</h6>
+                        <button class="btn-close-panel" onclick="closePanel()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
                     </div>
-                    <div class="card-body">
-                        <!-- Summary Security Indicator -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="security-summary-card p-4 rounded text-center" id="securitySummary">
-                                    <div class="security-icon mb-2" id="securityIcon">
-                                        <i class="bi bi-shield-check" style="font-size: 3rem; color: #198754;"></i>
-                                    </div>
-                                    <h4 class="security-title mb-1" id="securityTitle">Strong Password</h4>
-                                    <p class="security-desc mb-2" id="securityDesc">This password would take years to crack with modern computers</p>
-                                    <div class="security-metric" id="securityMetric">
-                                        <span class="metric-value" id="primaryCrackTime">-</span>
-                                        <span class="metric-label">with online attacks</span>
-                                    </div>
-                                </div>
+
+                    <div id="analysisResults" style="display: none;">
+                        <!-- Score & Entropy -->
+                        <div class="score-row mb-3">
+                            <div class="score-box">
+                                <div class="score-circle-sm" id="scoreCircle">-</div>
+                                <small>Score</small>
+                            </div>
+                            <div class="entropy-box">
+                                <div class="entropy-number" id="entropyValue">--</div>
+                                <small>bits of entropy</small>
                             </div>
                         </div>
 
-                        <!-- Detailed Crack Times -->
-                        <div class="row g-3" id="crackTimesSection">
-                            <div class="col-md-6 col-lg-3">
-                                <div class="crack-time-card p-3 rounded">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="small text-muted">
-                                            <i class="bi bi-globe"></i> Online (Throttled)
-                                        </div>
-                                        <div class="risk-indicator" id="riskOnlineThrottled">
-                                            <span class="risk-dot"></span>
-                                        </div>
-                                    </div>
-                                    <div class="fw-semibold crack-time-value" id="timeOnlineThrottled">-</div>
-                                    <div class="small text-muted">100 attempts/hour</div>
-                                </div>
+                        <!-- Progress Bar -->
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar" id="strengthBar" style="width: 0%"></div>
+                        </div>
+
+                        <!-- Crack Times -->
+                        <div class="crack-times-compact mb-3">
+                            <div class="crack-item">
+                                <span class="crack-label">Online Slow</span>
+                                <span class="crack-value" id="timeOnlineThrottled">--</span>
                             </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="crack-time-card p-3 rounded">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="small text-muted">
-                                            <i class="bi bi-globe"></i> Online (Unthrottled)
-                                        </div>
-                                        <div class="risk-indicator" id="riskOnlineNoThrottle">
-                                            <span class="risk-dot"></span>
-                                        </div>
-                                    </div>
-                                    <div class="fw-semibold crack-time-value" id="timeOnlineNoThrottle">-</div>
-                                    <div class="small text-muted">10 attempts/second</div>
-                                </div>
+                            <div class="crack-item">
+                                <span class="crack-label">Online Fast</span>
+                                <span class="crack-value" id="timeOnlineNoThrottle">--</span>
                             </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="crack-time-card p-3 rounded">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="small text-muted">
-                                            <i class="bi bi-hdd"></i> Offline (Slow Hash)
-                                        </div>
-                                        <div class="risk-indicator" id="riskOfflineSlow">
-                                            <span class="risk-dot"></span>
-                                        </div>
-                                    </div>
-                                    <div class="fw-semibold crack-time-value" id="timeOfflineSlow">-</div>
-                                    <div class="small text-muted">10,000 attempts/second</div>
-                                </div>
+                            <div class="crack-item">
+                                <span class="crack-label">Offline Slow</span>
+                                <span class="crack-value" id="timeOfflineSlow">--</span>
                             </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="crack-time-card p-3 rounded">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="small text-muted">
-                                            <i class="bi bi-hdd-network"></i> Offline (Fast Hash)
-                                        </div>
-                                        <div class="risk-indicator" id="riskOfflineFast">
-                                            <span class="risk-dot"></span>
-                                        </div>
-                                    </div>
-                                    <div class="fw-semibold crack-time-value" id="timeOfflineFast">-</div>
-                                    <div class="small text-muted">10 billion attempts/second</div>
-                                </div>
+                            <div class="crack-item">
+                                <span class="crack-label">Offline Fast</span>
+                                <span class="crack-value" id="timeOfflineFast">--</span>
                             </div>
                         </div>
 
-                        <!-- Security Legend -->
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="security-legend d-flex justify-content-center gap-3">
-                                    <div class="legend-item">
-                                        <span class="legend-dot risk-low"></span>
-                                        <span class="legend-text">Low Risk</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <span class="legend-dot risk-medium"></span>
-                                        <span class="legend-text">Medium Risk</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <span class="legend-dot risk-high"></span>
-                                        <span class="legend-text">High Risk</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <span class="legend-dot risk-critical"></span>
-                                        <span class="legend-text">Critical Risk</span>
-                                    </div>
-                                </div>
+                        <!-- Security Verdict -->
+                        <div class="security-verdict" id="securityVerdict">
+                            <i class="bi bi-shield-check" id="securityIcon"></i>
+                            <span id="securityText">--</span>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div class="feedback-area" id="feedbackArea" style="display: none;">
+                            <div class="alert alert-sm" id="feedbackAlert">
+                                <div id="feedbackWarning"></div>
+                                <ul id="feedbackSuggestions" class="mb-0 small"></ul>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="text-center text-muted small" id="noAnalysisYet">
+                        Type a password and click Analyze
                     </div>
                 </div>
+            </div>
 
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-key"></i> Password Generator</h5>
+            <!-- Advanced Section (Collapsible) -->
+            <div class="collapsible-section">
+                <button class="section-toggle" onclick="toggleSection('advancedSection')">
+                    <i class="bi bi-gear"></i> Advanced <i class="bi bi-chevron-down ms-auto" id="advancedSectionIcon"></i>
+                </button>
+                <div class="section-content" id="advancedSection" style="display: none;">
+                    <div class="advanced-options">
+                        <button class="quick-action-btn" onclick="selectAllChars()">
+                            <i class="bi bi-check-all"></i> Select All Chars
+                        </button>
+                        <button class="quick-action-btn" onclick="selectNoneChars()">
+                            <i class="bi bi-x-circle"></i> Select None
+                        </button>
+                        <button class="quick-action-btn" onclick="clearPassword()">
+                            <i class="bi bi-trash"></i> Clear Input
+                        </button>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-info mb-4">
-                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Advanced Password Generator</h6>
-                            <p class="mb-0 small">Generate secure passwords with customizable length and entropy. Higher entropy = harder to crack. Use sliders for real-time feedback.</p>
-                        </div>
+                </div>
+            </div>
+
+            <!-- Understanding Section (Collapsible) -->
+            <div class="collapsible-section">
+                <button class="section-toggle" onclick="toggleSection('understandingSection')">
+                    <i class="bi bi-info-circle"></i> Understanding Password Entropy 
+                    <i class="bi bi-chevron-down ms-auto" id="understandingSectionIcon"></i>
+                </button>
+                <div class="section-content" id="understandingSection" style="display: none;">
+                    <div class="understanding-content">
+                        <p class="small">Entropy measures password unpredictability in <strong>bits</strong>. Higher entropy = harder to crack.</p>
                         
-                        <!-- Password Length Control -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
-                                <span>Password Length</span>
-                                <span class="range-value" id="lengthValue">14</span>
-                            </label>
-                            <input type="range" class="range-slider" id="passwordLength" min="5" max="128" value="14">
-                            <div class="form-text d-flex justify-content-between mt-1">
-                                <span>5 chars</span>
-                                <span>128 chars</span>
+                        <div class="entropy-scale">
+                            <div class="scale-item weak">
+                                <span class="scale-range">0-40</span>
+                                <span class="scale-label">Weak</span>
+                            </div>
+                            <div class="scale-item moderate">
+                                <span class="scale-range">40-60</span>
+                                <span class="scale-label">Moderate</span>
+                            </div>
+                            <div class="scale-item strong">
+                                <span class="scale-range">60-80</span>
+                                <span class="scale-label">Strong</span>
+                            </div>
+                            <div class="scale-item very-strong">
+                                <span class="scale-range">80+</span>
+                                <span class="scale-label">Very Strong</span>
                             </div>
                         </div>
 
-                        <!-- Password Strength Presets -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Password Strength</label>
-                            <div class="strength-presets d-grid gap-2">
-                                <button type="button" class="strength-preset-btn strength-quick" onclick="setStrengthPreset('quick')">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="text-start">
-                                            <div class="preset-title">🔓 Quick Password</div>
-                                            <div class="preset-desc">12 characters • Everyday accounts</div>
-                                        </div>
-                                        <div class="preset-strength">Quick</div>
-                                    </div>
-                                </button>
-                                <button type="button" class="strength-preset-btn strength-strong active" onclick="setStrengthPreset('strong')">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="text-start">
-                                            <div class="preset-title">🔒 Strong Password</div>
-                                            <div class="preset-desc">16 characters • Important accounts</div>
-                                        </div>
-                                        <div class="preset-strength">Strong</div>
-                                    </div>
-                                </button>
-                                <button type="button" class="strength-preset-btn strength-maximum" onclick="setStrengthPreset('maximum')">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="text-start">
-                                            <div class="preset-title">🔒🔒 Maximum Security</div>
-                                            <div class="preset-desc">24 characters • High-security accounts</div>
-                                        </div>
-                                        <div class="preset-strength">Maximum</div>
-                                    </div>
-                                </button>
-                            </div>
+                        <div class="social-links">
+                            <a href="https://github.com/nkv-dev" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-github"></i>
+                            </a>
+                            <a href="https://linkedin.com/in/nkv-dev" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
                         </div>
-
-                        <!-- Character Type Selection -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Character Types</label>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="char-type-card active" data-type="lowercase">
-                                        <div class="char-type-header">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="useLowercase" checked>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <div class="char-type-icon">
-                                                <i class="bi bi-type"></i>
-                                            </div>
-                                            <span class="char-type-title">Lowercase</span>
-                                            <span class="char-type-count">26</span>
-                                        </div>
-                                        <div class="char-type-chars">abcdefghijklmnopqrstuvwxyz</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="char-type-card active" data-type="uppercase">
-                                        <div class="char-type-header">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="useUppercase" checked>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <div class="char-type-icon">
-                                                <i class="bi bi-type-bold"></i>
-                                            </div>
-                                            <span class="char-type-title">Uppercase</span>
-                                            <span class="char-type-count">26</span>
-                                        </div>
-                                        <div class="char-type-chars">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="char-type-card active" data-type="digits">
-                                        <div class="char-type-header">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="useDigits" checked>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <div class="char-type-icon">
-                                                <i class="bi bi-123"></i>
-                                            </div>
-                                            <span class="char-type-title">Numbers</span>
-                                            <span class="char-type-count">10</span>
-                                        </div>
-                                        <div class="char-type-chars">0123456789</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="char-type-card active" data-type="symbols">
-                                        <div class="char-type-header">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="useSymbols" checked>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <div class="char-type-icon">
-                                                <i class="bi bi-exclamation-circle"></i>
-                                            </div>
-                                            <span class="char-type-title">Symbols</span>
-                                            <span class="char-type-count">32</span>
-                                        </div>
-                                        <div class="char-type-chars">!@#$%^&*()_+-=[]{}|;:,.<>?</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="quick-actions mt-3">
-                                <button type="button" class="quick-action-btn" onclick="selectAllChars()">
-                                    <i class="bi bi-check-all"></i> Select All
-                                </button>
-                                <button type="button" class="quick-action-btn" onclick="selectNoneChars()">
-                                    <i class="bi bi-x-circle"></i> Select None
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Generate Button -->
-                        <div class="text-center">
-                            <button class="btn btn-primary btn-lg px-5" onclick="generatePassword()">
-                                <i class="bi bi-stars"></i> Generate Password
-                            </button>
-                        </div>
-
-                        <!-- Enhanced Password Display -->
-                        <div id="generatedPasswordSection" class="mt-4 d-none">
-                            <div class="password-display-container">
-                                <div class="text-center mb-2">
-                                    <h6 class="text-muted mb-2">Generated Password</h6>
-                                    <div class="password-text" id="generatedPassword"></div>
-                                </div>
-                                
-                                <div class="password-strength-bar">
-                                    <div class="password-strength-fill" id="passwordStrengthBar"></div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <div class="small text-muted">
-                                        <span id="passwordStrengthText">-</span> • 
-                                        <span id="generatedEntropy">-</span> bits • 
-                                        <span id="generatedLength">-</span> chars
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-outline-info btn-sm me-2" onclick="checkEntropy()">
-                                            <i class="bi bi-shield-check"></i> Check Entropy
-                                        </button>
-                                        <button class="btn btn-outline-primary btn-sm me-2" onclick="regeneratePassword()">
-                                            <i class="bi bi-arrow-clockwise"></i> Regenerate
-                                        </button>
-                                        <button class="btn btn-primary btn-sm" onclick="copyPassword()">
-                                            <i class="bi bi-clipboard"></i> Copy
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Understanding Password Entropy</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-question-circle"></i> What is Entropy?</h6>
-                                <p class="small text-muted">Entropy measures how unpredictable your password is, measured in <strong>bits</strong>. It's based on:</p>
-                                <ul class="small text-muted">
-                                    <li>Password length</li>
-                                    <li>Character types used (lowercase, uppercase, numbers, symbols)</li>
-                                    <li>Randomness of the password</li>
-                                </ul>
-                                <p class="small text-muted mb-0">Each bit of entropy doubles the search space, making brute-force attacks exponentially harder.</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-target"></i> Recommended Entropy Levels</h6>
-                                <div class="table-responsive">
-                                    <table class="table table-sm small mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Bits</th>
-                                                <th>Strength</th>
-                                                <th>Use Case</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="table-danger-subtle">
-                                                <td>0-40</td>
-                                                <td>Very Weak</td>
-                                                <td>Not recommended</td>
-                                            </tr>
-                                            <tr class="table-warning-subtle">
-                                                <td>40-60</td>
-                                                <td>Weak</td>
-                                                <td>Low-risk accounts</td>
-                                            </tr>
-                                            <tr class="table-primary-subtle">
-                                                <td>60-80</td>
-                                                <td>Moderate</td>
-                                                <td>Most accounts</td>
-                                            </tr>
-                                            <tr class="table-success-subtle">
-                                                <td>80+</td>
-                                                <td>Strong</td>
-                                                <td>Email, banking, sensitive</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <div class="text-center p-3 rounded bg-danger-subtle">
-                                    <div class="fw-bold">0-40 bits</div>
-                                    <div class="small text-muted">Very Weak</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 rounded bg-warning-subtle">
-                                    <div class="fw-bold">40-60 bits</div>
-                                    <div class="small text-muted">Weak</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 rounded bg-primary-subtle">
-                                    <div class="fw-bold">60-80 bits</div>
-                                    <div class="small text-muted">Moderate</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 rounded bg-success-subtle">
-                                    <div class="fw-bold">80+ bits</div>
-                                    <div class="small text-muted">Strong</div>
-                                </div>
-                            </div>
-                        </div>
+                        <small class="text-muted d-block text-center mt-2">
+                            Created by nkv-dev
+                        </small>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
-
-    <footer class="py-4 text-center border-top">
-        <div class="container">
-            <div class="social-links mb-3">
-                <a href="https://github.com/nkv-dev" class="social-link me-3" target="_blank" rel="noopener noreferrer" title="GitHub">
-                    <i class="bi bi-github"></i>
-                </a>
-                <a href="https://linkedin.com/in/nkv-dev" class="social-link me-3" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-                    <i class="bi bi-linkedin"></i>
-                </a>
-                <a href="https://buymeacoffee.com/nkvdev" class="social-link" target="_blank" rel="noopener noreferrer" title="Buy Me Coffee">
-                    <i class="bi bi-cup-hot"></i>
-                </a>
-            </div>
-            <small class="text-muted">
-                Created by nkv-dev | Password Entropy Tool
-            </small>
-        </div>
-    </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/script.js"></script>
     <script>
-        // Lazy load zxcvbn.js only when needed
-        let zxcvbnLoaded = false;
+        // Chaos Bubble Animation
+        const canvas = document.getElementById('chaos-canvas');
+        const ctx = canvas.getContext('2d');
         
-        function loadZxcvbn() {
-            if (!zxcvbnLoaded) {
-                const script = document.createElement('script');
-                script.src = '/static/js/zxcvbn.js';
-                script.onload = () => {
-                    zxcvbnLoaded = true;
-                    console.log('zxcvbn.js loaded');
-                };
-                document.head.appendChild(script);
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        // Bubble system
+        const bubbles = [];
+        const bubbleCount = 25;
+        
+        class Bubble {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 4 + 2;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(124, 124, 255, ${this.opacity})`;
+                ctx.fill();
             }
         }
         
-        // Load when user starts typing password
-        document.addEventListener('DOMContentLoaded', () => {
-            const passwordInput = document.getElementById('passwordInput');
-            let loadTimeout;
+        // Initialize bubbles
+        for (let i = 0; i < bubbleCount; i++) {
+            bubbles.push(new Bubble());
+        }
+        
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            passwordInput.addEventListener('focus', () => {
-                loadTimeout = setTimeout(loadZxcvbn, 1000);
+            // Draw bubbles
+            bubbles.forEach(bubble => {
+                bubble.update();
+                bubble.draw();
             });
             
-            passwordInput.addEventListener('blur', () => {
-                clearTimeout(loadTimeout);
+            // Draw connections
+            bubbles.forEach((bubble, i) => {
+                bubbles.slice(i + 1).forEach(other => {
+                    const dx = bubble.x - other.x;
+                    const dy = bubble.y - other.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(bubble.x, bubble.y);
+                        ctx.lineTo(other.x, other.y);
+                        ctx.strokeStyle = `rgba(124, 124, 255, ${0.1 * (1 - distance / 150)})`;
+                        ctx.stroke();
+                    }
+                });
             });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // Panel Toggle Functions
+        function showGeneratePanel() {
+            document.getElementById('generatePanel').style.display = 'block';
+            document.getElementById('analyzePanel').style.display = 'none';
+            // Generate password automatically
+            generatePassword();
+        }
+        
+        function showAnalyzePanel() {
+            document.getElementById('generatePanel').style.display = 'none';
+            document.getElementById('analyzePanel').style.display = 'block';
+            // Trigger analysis
+            analyzePassword();
+        }
+        
+        function closePanel() {
+            document.getElementById('generatePanel').style.display = 'none';
+            document.getElementById('analyzePanel').style.display = 'none';
+        }
+        
+        // Collapsible Sections
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + 'Icon');
+            
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');
+            } else {
+                section.style.display = 'none';
+                icon.classList.remove('bi-chevron-up');
+                icon.classList.add('bi-chevron-down');
+            }
+        }
+        
+        // Clear password
+        function clearPassword() {
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('quickStats').style.display = 'none';
+            document.getElementById('noAnalysisYet').style.display = 'block';
+            document.getElementById('analysisResults').style.display = 'none';
+            closePanel();
+        }
+        
+        // Override displayResults to show quick stats
+        const originalDisplayResults = displayResults;
+        displayResults = function(data, zxcvbnResult) {
+            // Call original
+            originalDisplayResults(data, zxcvbnResult);
+            
+            // Show quick stats
+            document.getElementById('quickStats').style.display = 'flex';
+            document.getElementById('quickEntropy').textContent = data.entropy.toFixed(1) + ' bits';
+            
+            const strengthLabels = ['Very Weak', 'Weak', 'Moderate', 'Strong', 'Very Strong'];
+            document.getElementById('quickStrength').textContent = strengthLabels[data.score];
+            
+            // Update analysis panel
+            document.getElementById('noAnalysisYet').style.display = 'none';
+            document.getElementById('analysisResults').style.display = 'block';
+            
+            // Update security verdict
+            updateSecurityVerdict(data.score);
+        };
+        
+        function updateSecurityVerdict(score) {
+            const verdict = document.getElementById('securityVerdict');
+            const icon = document.getElementById('securityIcon');
+            const text = document.getElementById('securityText');
+            
+            const verdicts = [
+                { icon: 'bi-shield-x', text: 'Critical - Change immediately!', color: '#dc3545' },
+                { icon: 'bi-shield-exclamation', text: 'Weak - Needs improvement', color: '#fd7e14' },
+                { icon: 'bi-shield-minus', text: 'Moderate - Could be stronger', color: '#ffc107' },
+                { icon: 'bi-shield-check', text: 'Strong - Good protection', color: '#7c7cff' },
+                { icon: 'bi-shield-fill-check', text: 'Very Strong - Excellent!', color: '#198754' }
+            ];
+            
+            const v = verdicts[score];
+            icon.className = 'bi ' + v.icon;
+            icon.style.color = v.color;
+            text.textContent = v.text;
+            verdict.style.borderColor = v.color;
+        }
+        
+        // Override generatePassword to show generated display
+        const originalGeneratePassword = generatePassword;
+        generatePassword = async function() {
+            await originalGeneratePassword();
+            document.getElementById('generatedDisplay').style.display = 'flex';
+        };
+        
+        // Password visibility toggle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const input = document.getElementById('passwordInput');
+            const eye = document.getElementById('passwordEye');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.remove('bi-eye');
+                eye.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.remove('bi-eye-slash');
+                eye.classList.add('bi-eye');
+            }
+        });
+        
+        // Real-time analysis on input
+        const passwordInput = document.getElementById('passwordInput');
+        let inputTimeout;
+        
+        passwordInput.addEventListener('input', function() {
+            clearTimeout(inputTimeout);
+            
+            if (this.value.length > 0) {
+                inputTimeout = setTimeout(() => {
+                    // Just update quick stats, don't open panel
+                    analyzePassword();
+                }, 500);
+            } else {
+                document.getElementById('quickStats').style.display = 'none';
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initPasswordGenerator();
         });
     </script>
 </body>
